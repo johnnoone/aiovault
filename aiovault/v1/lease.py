@@ -1,6 +1,9 @@
 
 class LeaseEndpoint:
 
+    def __init__(self, req_handler):
+        self.req_handler = req_handler
+
     def renew(self, lease_id, increment=None):
         """Renew a secret, requesting to extend the lease.
 

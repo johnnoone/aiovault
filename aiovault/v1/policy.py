@@ -1,6 +1,9 @@
 
 class PolicyEndpoint:
 
+    def __init__(self, req_handler):
+        self.req_handler = req_handler
+
     def list(self):
         """Lists all the available policies.
         """

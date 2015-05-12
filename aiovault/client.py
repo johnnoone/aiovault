@@ -1,7 +1,7 @@
-import aiohttp
 import asyncio
 import json
-from aiovault import v1
+from aiohttp import ClientSession
+from . import v1
 from .exceptions import DownError, HTTPError, InvalidRequest, InvalidPath
 from .exceptions import InternalServerError, RateLimitExceeded, Unauthorized
 
@@ -50,6 +50,11 @@ class Request:
         self.version = version
         self.token = token
 
+        cookies = {}
+        if self.token:
+            cookies.setdefault('token', self.token)
+        self.session = ClientSession(cookies=cookies)
+
     @asyncio.coroutine
     def request(self, method, path, **kwargs):
         url = '%s/%s%s' % (self.addr, self.version, path)
@@ -60,13 +65,7 @@ class Request:
             headers = kwargs.setdefault('headers', {})
             headers['Content-Type'] = 'application/json'
 
-        if self.token:
-            cookies = kwargs.setdefault('cookies', {})
-            cookies.setdefault('token', self.token)
-
-        response = yield from aiohttp.request(method, url, **kwargs)
-        if 'token' in response.cookies:
-            self.token = response.cookies['token']
+        response = yield from self.session.request(method, url, **kwargs)
 
         if response.status in (200, 204):
             return response

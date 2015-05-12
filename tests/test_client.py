@@ -63,30 +63,3 @@ def test_doc(dev_server):
     response = yield from client.req_handler('GET', '/sys/auth/github',
                                              params={"help": 1})
     data = yield from response.json()
-
-
-@async_test
-def test_generic(dev_server):
-    client = Vault(dev_server['addr'],
-                   token=dev_server['root_token'])
-
-    store = yield from client.secret.load('secret')
-    assert store.__repr__() == "<GenericBackend(name='secret')>"
-
-    data = yield from store.write('foo', {'value': 'bar'})
-    assert data
-
-    data = yield from store.read('foo')
-    assert data['data'] == {'value': 'bar'}
-
-    data = yield from store.delete('foo')
-    assert data
-
-    with pytest.raises(ValueError):
-        yield from store.write('bar', 'baz')
-
-    with pytest.raises(KeyError):
-        yield from store.read('bar')
-
-    data = yield from store.delete('bar')
-    assert data

@@ -32,3 +32,10 @@ Backends
 .. autoclass:: aiovault.v1.secret.backends.GenericBackend
    :members:
    :inherited-members:
+
+
+Objects
+-------
+
+.. autoclass:: aiovault.Value
+   :members:
