@@ -4,8 +4,8 @@ from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
 from contextlib import suppress
 
-class RawEndpoint:
 
+class RawEndpoint:
     """
 
     .. note:: This is the raw path in the storage backend and not the logical

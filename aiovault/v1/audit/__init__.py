@@ -9,7 +9,7 @@ class AuditEndpoint:
     log contains every interaction with Vault, including errors.
     """
 
-    def put(self, name, type, description=None, **options):
+    def write(self, name, type, description=None, **options):
         """Enable an audit backend.
 
         Parameters:

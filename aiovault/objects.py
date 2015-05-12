@@ -44,7 +44,7 @@ class Health:
 
     def __repr__(self):
         return '<Health(initialized=%r, sealed=%r, standby=%r)>' % (
-            self.initialized, self.sealed, sealed.standby)
+            self.initialized, self.sealed, self.standby)
 
 
 class SealStatus:
@@ -56,11 +56,12 @@ class SealStatus:
         self.progress = progress
 
     def __repr__(self):
-        return '<SealStatus(sealed=%r, threshold=%r, shares=%r, progress=%r)>' % (
+        return '<SealStatus(sealed=%r, threshold=%r, shares=%r, progress=%r)>' % (  # noqa
             self.sealed, self.threshold, self.shares, self.progress)
 
 
 class Value:
+
     def __init__(self, *, lease_duration, auth, renewable, lease_id, data):
         self.lease_duration = lease_duration
         self.auth = auth
@@ -81,3 +82,18 @@ class Value:
 
     def __repr__(self):
         return '<Value(data=%r)>' % self.data
+
+
+class Policy:
+
+    def __init__(self, *, name, rules):
+        self.name = name
+        self.rules = rules or {}
+
+    def __eq__(self, other):
+        if isinstance(other, Policy):
+            other == other.rules
+        return self.rules == other
+
+    def __repr__(self):
+        return '<Policy(name=%r)>' % self.name
