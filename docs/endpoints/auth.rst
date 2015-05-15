@@ -28,3 +28,13 @@ Backends
 .. autoclass:: aiovault.v1.auth.backends.UserPassBackend
    :members:
    :inherited-members:
+
+
+Objects
+-------
+
+.. autoclass:: aiovault.WrittenToken
+   :members:
+
+.. autoclass:: aiovault.ReadToken
+   :members:

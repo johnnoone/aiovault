@@ -1,8 +1,15 @@
 import asyncio
 from .bases import AuthBackend
+from aiovault.exceptions import InvalidPath
+from aiovault.objects import ReadToken, WrittenToken
+from aiovault.util import task
 
 
 class TokenBackend(AuthBackend):
+
+    @task
+    def login(self, token):
+        raise NotImplementedError('Irrelevant operation')
 
     @asyncio.coroutine
     def create(self, *, id=None, policies=None, metadata=None, no_parent=None,
@@ -33,9 +40,11 @@ class TokenBackend(AuthBackend):
                             used to create a one-time-token or limited use
                             token. Defaults to 0, which has no limit to number
                             of uses.
+        Returns:
+            WrittenToken: The client token
         """
         method = 'POST'
-        path = '/%s/token/create' % self.name
+        path = '/auth/%s/create' % self.name
         data = {'id': id,
                 'policies': policies,
                 'metadata': metadata,
@@ -44,20 +53,23 @@ class TokenBackend(AuthBackend):
                 'display_name': display_name,
                 'num_uses': num_uses}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
-        return result
+        return WrittenToken(**result)
 
     @asyncio.coroutine
     def lookup_self(self):
         """Returns information about the current client token.
+
+        Returns:
+            ReadToken: The current client token
         """
         method = 'GET'
-        path = '/%s/token/lookup-self' % self.name
+        path = '/auth/%s/lookup-self' % self.name
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result
+        return ReadToken(**result)
 
     @asyncio.coroutine
     def lookup(self, token):
@@ -65,14 +77,19 @@ class TokenBackend(AuthBackend):
 
         Parameters:
             token (str): The token ID
+        Returns:
+            ReadToken: The client token
         """
         token = getattr(token, 'id', token)
         method = 'GET'
-        path = '/%s/token/lookup/%s' % (self.name, token)
+        path = '/auth/%s/lookup/%s' % (self.name, token)
 
-        response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        try:
+            response = yield from self.req_handler(method, path)
+            result = yield from response.json()
+            return ReadToken(**result)
+        except InvalidPath:
+            raise KeyError('%r does not exists' % token)
 
     @asyncio.coroutine
     def revoke(self, token):
@@ -86,7 +103,7 @@ class TokenBackend(AuthBackend):
         """
         token = getattr(token, 'id', token)
         method = 'POST'
-        path = '/%s/token/revoke/%s' % (self.name, token)
+        path = '/auth/%s/revoke/%s' % (self.name, token)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -98,14 +115,14 @@ class TokenBackend(AuthBackend):
 
         When the token is revoked, all secrets generated with it are also
         revoked. All child tokens are orphaned, but can be revoked
-        sub-sequently using :ref:`revoke()`.
+        sub-sequently using :py:meth:`revoke`.
 
         Parameters:
             token (str): The token ID
         """
         token = getattr(token, 'id', token)
         method = 'POST'
-        path = '/%s/token/revoke-orphan/%s' % (self.name, token)
+        path = '/auth/%s/revoke-orphan/%s' % (self.name, token)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -122,11 +139,10 @@ class TokenBackend(AuthBackend):
             token (str): The token ID
         """
         method = 'POST'
-        path = '/%s/token/revoke-prefix/%s' % (self.name, prefix)
+        path = '/auth/%s/revoke-prefix/%s' % (self.name, prefix)
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def renew(self, token, increment=None):
@@ -139,12 +155,14 @@ class TokenBackend(AuthBackend):
             token (str): The token ID
             increment (int): An optional requested lease increment can be
                              provided. This increment may be ignored.
+        Returns:
+            WrittenToken: The client token
         """
         token = getattr(token, 'id', token)
         method = 'POST'
-        path = '/%s/token/renew/%s' % (self.name, token)
+        path = '/auth/%s/renew/%s' % (self.name, token)
         data = {'increment': increment}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
-        return result
+        return WrittenToken(**result)

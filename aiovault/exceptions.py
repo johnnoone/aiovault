@@ -1,6 +1,19 @@
 
 class HTTPError(Exception):
-    """Common http errors"""
+    """Common http errors
+    """
+
+    def __init__(self, *args, **kwargs):
+        if args and isinstance(args[0], dict):
+            for k, v in args[0].items():
+                setattr(self, k, v)
+
+        args = list(args)
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+            args.append(v)
+
+        super().__init__(*args)
 
 
 class InvalidRequest(HTTPError):
@@ -46,4 +59,9 @@ class DownError(HTTPError):
     """Vault is down for maintenance or is currently sealed.
 
     Try again later
+    """
+
+
+class LoginError(InvalidRequest):
+    """Raised when login failed
     """

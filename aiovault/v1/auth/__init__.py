@@ -1,6 +1,5 @@
 import asyncio
-import os.path
-from .backends import load_backend
+from .backends import load_backend, load_login
 
 
 class AuthEndpoint:
@@ -9,13 +8,12 @@ class AuthEndpoint:
         self.req_handler = req_handler
 
     @asyncio.coroutine
-    def login(self, endpoint, *args, **kwargs):
-        """Allow to login"""
-        method = 'POST'
-        path = '/' + os.path.join('auth', endpoint, 'login', *args)
-        response = yield from self.req_handler(method, path, json=kwargs)
-        data = yield from response.json()
-        return data
+    def login(self, endpoint, **credentials):
+        res = load_login(endpoint, {
+            'name': endpoint,
+            'req_handler': self.req_handler
+        }, credentials)
+        return res
 
     @asyncio.coroutine
     def items(self):
@@ -33,16 +31,18 @@ class AuthEndpoint:
         method = 'GET'
         path = '/sys/auth'
 
-        a, b = None, None
         if name.endswith('/'):
-            a, b = name, name[:-1]
+            mount, name = name, name[:-1]
         else:
-            a, b = name + '/', name
+            mount = name + '/'
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        data = result[a]
-        return load_backend(data['type'], b, req_handler=self.req_handler)
+        data = result[mount]
+        return load_backend(data['type'], {
+            'name': name,
+            'req_handler': self.req_handler
+        })
 
     @asyncio.coroutine
     def add(self, name, *, type=None, description=None):

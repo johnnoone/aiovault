@@ -9,6 +9,7 @@ from .exceptions import InternalServerError, RateLimitExceeded, Unauthorized
 class Vault(v1.SysEndpoint):
 
     def __init__(self, addr, token=None):
+        token = getattr(token, 'id', token)
         self.req_handler = Request(addr, 'v1', token=token)
 
     @property
@@ -39,6 +40,24 @@ class Vault(v1.SysEndpoint):
     def secret(self):
         return v1.SecretEndpoint(self.req_handler)
 
+    @asyncio.coroutine
+    def read(self, path, **kwargs):
+        method = kwargs.pop('method', 'GET')
+        response = yield from self.req_handler(method, path, **kwargs)
+        return response
+
+    @asyncio.coroutine
+    def write(self, path, **kwargs):
+        method = kwargs.pop('method', 'POST')
+        response = yield from self.req_handler(method, path, **kwargs)
+        return response
+
+    @asyncio.coroutine
+    def delete(self, path, **kwargs):
+        method = kwargs.pop('method', 'DELETE')
+        response = yield from self.req_handler(method, path, **kwargs)
+        return response
+
     def __repr__(self):
         return '<Vault(addr=%r)>' % self.req_handler.addr
 
@@ -58,6 +77,10 @@ class Request:
     @asyncio.coroutine
     def request(self, method, path, **kwargs):
         url = '%s/%s%s' % (self.addr, self.version, path)
+
+        for field in ('params', 'data', 'json'):
+            if field in kwargs and isinstance(kwargs[field], dict):
+                kwargs[field] = no_null(kwargs[field])
 
         data = kwargs.pop('json', None)
         if data is not None:
@@ -85,3 +108,7 @@ class Request:
         raise HTTPError(data)
 
     __call__ = request
+
+
+def no_null(data):
+    return {k: v for k, v in data.items() if v is not None}

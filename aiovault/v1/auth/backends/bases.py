@@ -1,5 +1,6 @@
 import asyncio
 from abc import ABCMeta, abstractmethod
+from aiovault.util import task
 
 
 class AuthBackend(metaclass=ABCMeta):
@@ -8,10 +9,11 @@ class AuthBackend(metaclass=ABCMeta):
         self.name = name
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     @abstractmethod
     def login(self):
-        pass
+        """Performs login
+        """
 
     @asyncio.coroutine
     def help(self):

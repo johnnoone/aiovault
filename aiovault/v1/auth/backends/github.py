@@ -1,8 +1,14 @@
 import asyncio
 from .bases import AuthBackend
+from aiovault.objects import WrittenToken
+from aiovault.util import task
 
 
 class GitHubBackend(AuthBackend):
+
+    @task
+    def login(self):
+        raise NotImplementedError('Not implemented')
 
     @asyncio.coroutine
     def configure(self, organization):
@@ -18,7 +24,7 @@ class GitHubBackend(AuthBackend):
 
         response = yield from self.req_handler(method, path, data=data)
         result = yield from response.json()
-        return result
+        return WrittenToken(**result)
 
     @asyncio.coroutine
     def set_team(self, team, policies):

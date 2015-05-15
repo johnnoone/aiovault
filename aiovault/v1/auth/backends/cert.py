@@ -1,14 +1,11 @@
 import asyncio
 from .bases import AuthBackend
+from aiovault.util import task
 
 
 class CertBackend(AuthBackend):
 
-    def __init__(self, name, req_handler):
-        self.name = name
-        self.req_handler = req_handler
-
-    @asyncio.coroutine
+    @task
     def login(self):
         method = 'POST'
         path = '/auth/%s/certs/login' % self.name
