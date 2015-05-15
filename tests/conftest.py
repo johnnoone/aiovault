@@ -1,4 +1,5 @@
 import asyncio
+import configparser
 import json
 import logging
 import os
@@ -106,3 +107,23 @@ def dev_server(request):
     server.start()
     request.addfinalizer(server.stop)
     return server.config
+
+
+@pytest.fixture(scope="session", autouse=True)
+def env(request):
+    response = Namespace()
+
+    for k, v in os.environ.items():
+        setattr(response, k, v)
+
+    config = configparser.ConfigParser()
+    config.optionxform = str
+    config.read(['vault-test.ini', os.path.expanduser('~/.vault-test.ini')])
+    if config.has_section('env'):
+        for k, v in config.items('env'):
+            setattr(response, k, v)
+    return response
+
+
+class Namespace:
+    pass

@@ -40,14 +40,20 @@ def test_doc(dev_server):
 
 
 @async_test
-def test_github_loading(dev_server):
+def test_github_loading(dev_server, env):
+    try:
+        github_org = env.GITHUB_ORG
+        github_token = env.GITHUB_TOKEN
+    except AttributeError:
+        return 'GITHUB_ORG or GITHUB_TOKEN missing'
+
     client = Vault(dev_server['addr'],
                    token=dev_server['root_token'])
     added = yield from client.auth.add('github')
     assert added
 
     store = yield from client.auth.load('github')
-    configured = yield from store.configure_organization('tasty-chicks')
+    configured = yield from store.configure_organization(github_org)
     assert configured
 
     configured = yield from store.configure_team('test', policies='foo')
@@ -55,10 +61,10 @@ def test_github_loading(dev_server):
 
 
     client2 = Vault(dev_server['addr'])
-    github_token='1111111111111111111111111111111111111111'
+    dummy_token='1111111111111111111111111111111111111111'
     with pytest.raises(LoginError):
         yield from client2.auth.login('github',
-                                      github_token=github_token)
-    github_token='7208a'+'181a5d54691a42607ac863'+'e3308f3b052cb'
+                                      github_token=dummy_token)
     token = yield from client2.auth.login('github',
                                           github_token=github_token)
+    print(token)
