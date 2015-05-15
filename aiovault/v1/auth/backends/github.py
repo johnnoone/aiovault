@@ -1,18 +1,28 @@
 import asyncio
 from .bases import AuthBackend
 from aiovault.objects import WrittenToken
-from aiovault.util import task
+from aiovault.util import format_policies, task
 
 
 class GitHubBackend(AuthBackend):
 
     @task
-    def login(self):
-        raise NotImplementedError('Not implemented')
+    def login(self, github_token):
+        """Log with github.
+        Parameters:
+            github_token (str): a github token
+        """
+        method = 'POST'
+        path = '/auth/%s/login' % self.name
+        data = {'token': github_token}
+
+        response = yield from self.req_handler(method, path, json=data)
+        result = yield from response.json()
+        return WrittenToken(**result)
 
     @asyncio.coroutine
-    def configure(self, organization):
-        """Configure github.
+    def configure_organization(self, organization):
+        """Configure github organization.
 
         Parameters:
             organization (str): The organization name a user must be a part of
@@ -22,13 +32,12 @@ class GitHubBackend(AuthBackend):
         path = '/auth/%s/config' % self.name
         data = {'organization': organization}
 
-        response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return WrittenToken(**result)
+        response = yield from self.req_handler(method, path, json=data)
+        return response.status == 204
 
     @asyncio.coroutine
-    def set_team(self, team, policies):
-        """docstring for configure
+    def configure_team(self, team, policies):
+        """Configure github team.
 
         Parameters:
             team (str):
@@ -36,8 +45,8 @@ class GitHubBackend(AuthBackend):
         """
         method = 'POST'
         path = '/auth/%s/map/teams/%s' % (self.name, team)
-        data = {'policies': policies}
+        policies = format_policies(policies)
+        data = {'value': policies}
 
-        response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return result
+        response = yield from self.req_handler(method, path, json=data)
+        return response.status == 204

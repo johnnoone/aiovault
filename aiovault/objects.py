@@ -143,7 +143,7 @@ class ReadToken(Token):
         return self.data['id']
 
     def __eq__(self, other):
-        if isinstance(other, Token):
+        if isinstance(other, ReadToken):
             other == other.data
         return self.data == other
 

@@ -3,8 +3,7 @@ import inspect
 from datetime import timedelta
 from functools import partial, wraps
 
-__all__ = ['extract_id', 'extract_name', 'extract_ref',
-           'format_duration', 'task']
+__all__ = ['format_duration', 'format_policies', 'task']
 
 
 def format_duration(obj):
@@ -16,6 +15,14 @@ def format_duration(obj):
     if isinstance(obj, timedelta):
         return '%ss' % int(obj.total_seconds())
     raise ValueError('wrong type %r' % obj)
+
+
+def format_policies(obj):
+    if isinstance(obj, (list, set, tuple)):
+        obj = ','.join(str(element) for element in obj)
+    elif obj:
+        obj = str(obj)
+    return obj
 
 
 def task(func=None, *, loop=None):

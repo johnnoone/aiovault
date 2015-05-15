@@ -1,7 +1,7 @@
 import asyncio
 from .bases import AuthBackend
 from aiovault.objects import WrittenToken
-from aiovault.util import task
+from aiovault.util import format_policies, task
 
 
 class AppIDBackend(AuthBackend):
@@ -31,9 +31,7 @@ class AppIDBackend(AuthBackend):
         app_id = getattr(app_id, 'id', app_id)
         method = 'POST'
         path = '/auth/%s/map/app-id/%s' % (self.name, app_id)
-
-        if policies and isinstance(policies, (list, set, tuple)):
-            policies = ','.join(policies)
+        policies = format_policies(policies)
 
         data = {'display_name': display_name or app_id,
                 'value': policies}
