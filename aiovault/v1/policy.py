@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Policy
-from contextlib import suppress
+from aiovault.util import suppress
 
 
 class PolicyEndpoint:

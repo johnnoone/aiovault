@@ -7,6 +7,7 @@ import os.path
 import pytest
 import re
 import sys
+from collections.abc import Mapping
 from functools import wraps
 from subprocess import Popen, PIPE
 from time import sleep
@@ -89,7 +90,8 @@ class DevServer:
         else:
             raise Exception('Unable to start %s [%s]' % (self.name, proc.pid))
 
-        self._data = data
+        self._data = Namespace()
+        self._data.update(data)
         print('Node %s [%s] is ready to rock' % (self.name, proc.pid), data)
 
     def stop(self):
@@ -101,7 +103,7 @@ class DevServer:
         return result
 
 
-@pytest.fixture(scope="function", autouse=False)
+@pytest.fixture(scope='function', autouse=False)
 def dev_server(request):
     server = DevServer('leader')
     server.start()
@@ -109,21 +111,23 @@ def dev_server(request):
     return server.config
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 def env(request):
     response = Namespace()
-
-    for k, v in os.environ.items():
-        setattr(response, k, v)
+    response.update(os.environ)
 
     config = configparser.ConfigParser()
-    config.optionxform = str
+    config.optionxform = str  # disable case transformation
     config.read(['vault-test.ini', os.path.expanduser('~/.vault-test.ini')])
     if config.has_section('env'):
-        for k, v in config.items('env'):
-            setattr(response, k, v)
+        response.update(config.items('env'))
     return response
 
 
 class Namespace:
-    pass
+
+    def update(self, data):
+        if isinstance(data, Mapping):
+            data = data.items()
+        for k, v in data:
+            setattr(self, k, v)

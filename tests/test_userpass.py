@@ -5,8 +5,8 @@ import pytest
 
 @async_test
 def test_userpass(dev_server):
-    client = Vault(dev_server['addr'],
-                   token=dev_server['root_token'])
+    client = Vault(dev_server.addr,
+                   token=dev_server.root_token)
 
     # enable userpass
     response = yield from client.auth.add('userpass')

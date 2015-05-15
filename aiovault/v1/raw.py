@@ -1,8 +1,8 @@
-import json
 import asyncio
+import json
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from contextlib import suppress
+from aiovault.util import suppress
 
 
 class RawEndpoint:

@@ -5,8 +5,8 @@ import pytest
 
 @async_test
 def test_status(dev_server):
-    client = Vault(dev_server['addr'],
-                   token=dev_server['root_token'])
+    client = Vault(dev_server.addr,
+                   token=dev_server.root_token)
 
     response = yield from client.status()
     assert response.initialized is True
@@ -17,4 +17,4 @@ def test_status(dev_server):
 
     response = yield from client.health()
     assert response.initialized is True
-    assert response.sealed is dev_server['sealed']
+    assert response.sealed is dev_server.sealed

@@ -6,8 +6,8 @@ import time
 
 @async_test
 def test_appid(dev_server):
-    client = Vault(dev_server['addr'],
-                   token=dev_server['root_token'])
+    client = Vault(dev_server.addr,
+                   token=dev_server.root_token)
 
     # enable app-id
     response = yield from client.auth.add('app-id')
@@ -23,7 +23,7 @@ def test_appid(dev_server):
     assert created
 
     # do login
-    client = Vault(dev_server['addr'])
+    client = Vault(dev_server.addr)
 
     # login
     result = yield from client.auth.login('app-id', app_id='foo', user_id='bar')
@@ -32,8 +32,8 @@ def test_appid(dev_server):
 
 @async_test
 def test_appid_raw(dev_server):
-    client = Vault(dev_server['addr'],
-                   token=dev_server['root_token'])
+    client = Vault(dev_server.addr,
+                   token=dev_server.root_token)
 
     # enable app-id
     response = yield from client.write('/sys/auth/app-id',
@@ -48,7 +48,7 @@ def test_appid_raw(dev_server):
     assert response.status == 204
 
     # do login
-    client = Vault(dev_server['addr'])
+    client = Vault(dev_server.addr)
 
     # login
     response = yield from client.write('/auth/app-id/login',
