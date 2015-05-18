@@ -21,6 +21,10 @@ Backends
    :members:
    :inherited-members:
 
+.. autoclass:: aiovault.v1.auth.backends.LDAPBackend
+   :members:
+   :inherited-members:
+
 .. autoclass:: aiovault.v1.auth.backends.TokenBackend
    :members:
    :inherited-members:

@@ -49,6 +49,7 @@ setup(
             'app-id = aiovault.v1.auth.backends:AppIDBackend',
             'cert = aiovault.v1.auth.backends:CertBackend',
             'github = aiovault.v1.auth.backends:GitHubBackend',
+            'ldap = aiovault.v1.auth.backends:LDAPBackend',
             'token = aiovault.v1.auth.backends:TokenBackend',
             'userpass = aiovault.v1.auth.backends:UserPassBackend'
         ],

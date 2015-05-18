@@ -3,6 +3,7 @@ import logging
 from .app_id import AppIDBackend
 from .cert import CertBackend
 from .github import GitHubBackend
+from .ldap import LDAPBackend
 from .token import TokenBackend
 from .userpass import UserPassBackend
 from inspect import signature
@@ -10,7 +11,7 @@ from stevedore import DriverManager, ExtensionManager
 from aiovault.exceptions import InvalidRequest, LoginError
 
 __all__ = ['AppIDBackend', 'CertBackend', 'GitHubBackend',
-           'TokenBackend', 'UserPassBackend']
+           'LDAPBackend', 'TokenBackend', 'UserPassBackend']
 
 
 def load_backend(type, backend):

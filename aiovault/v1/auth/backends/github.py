@@ -9,8 +9,11 @@ class GitHubBackend(AuthBackend):
     @task
     def login(self, *, github_token):
         """Log with github.
+
         Parameters:
             github_token (str): a github token
+        Returns:
+            WrittenToken
         """
         method = 'POST'
         path = '/auth/%s/login' % self.name
