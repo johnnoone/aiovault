@@ -2,6 +2,7 @@ import asyncio
 from . import v1
 from .request import Request
 
+
 class Vault(v1.SysEndpoint):
 
     def __init__(self, addr, token=None):

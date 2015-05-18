@@ -16,7 +16,7 @@ def test_cert(dev_server, env):
 
     filename = os.path.join(env.CERT_PATH, 'server.crt')
     with open(filename) as file:
-        added = yield from store.configure_cert('foo', certificate=file.read())
+        added = yield from store.write_cert('foo', certificate=file.read())
         assert added
 
     certs = [

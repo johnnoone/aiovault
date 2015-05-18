@@ -6,13 +6,15 @@ from aiovault.util import task
 
 
 class CertBackend(AuthBackend):
-    """
-    This endpoint allows you to create, read, update, and delete trusted certificates
-    that are allowed to authenticate.
+    """Manage trusted certificates used for authentication.
 
-    Deleting a certificate will not revoke auth for prior authenticated connections.
-    To do this, do a revoke on "login". If you don't need to revoke login immediately,
-    then the next renew will cause the lease to expire.
+    This endpoint allows you to create, read, update, and delete trusted
+    certificates that are allowed to authenticate.
+
+    Deleting a certificate will not revoke auth for prior authenticated
+    connections. To do this, do a revoke on "login". If you don't need to
+    revoke login immediately, then the next renew will cause the lease to
+    expire.
     """
 
     @task
@@ -29,12 +31,13 @@ class CertBackend(AuthBackend):
                                   self.req_handler.version,
                                   self.req_handler.token,
                                   cert)
-        response = yield from self.req_handler(method, path)
+        response = yield from req_handler(method, path)
         print(response)
 
     @asyncio.coroutine
-    def configure_cert(self, name, *, certificate, display_name=None, policies=None, lease=None):
-        """Manage trusted certificates used for authentication.
+    def write_cert(self, name, *, certificate, display_name=None,
+                   policies=None, lease=None):
+        """Write certificate
 
         Parameters:
             name (str): The name of the certificate
@@ -53,4 +56,31 @@ class CertBackend(AuthBackend):
                 'lease': lease}
 
         response = yield from self.req_handler(method, path, json=data)
+        return response.status == 204
+
+    @asyncio.coroutine
+    def read_cert(self, name):
+        """Read certificate
+
+        Parameters:
+            name (str): The name of the certificate
+        """
+        method = 'GET'
+        path = '/auth/%s/certs/%s' % (self.name, name)
+
+        response = yield from self.req_handler(method, path)
+        result = yield from response.json()
+        return result
+
+    @asyncio.coroutine
+    def delete_cert(self, name):
+        """Delete certificate
+
+        Parameters:
+            name (str): The name of the certificate
+        """
+        method = 'DELETE'
+        path = '/auth/%s/certs/%s' % (self.name, name)
+
+        response = yield from self.req_handler(method, path)
         return response.status == 204
