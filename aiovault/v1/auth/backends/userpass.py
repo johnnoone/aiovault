@@ -7,7 +7,7 @@ from aiovault.util import task
 class UserPassBackend(AuthBackend):
 
     @task
-    def login(self, username, password):
+    def login(self, *, username, password):
         """Returns information about the current client token.
 
         Parameters:

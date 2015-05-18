@@ -115,6 +115,7 @@ def dev_server(request):
 def env(request):
     response = Namespace()
     response.update(os.environ)
+    response.CERT_PATH = os.path.join(HERE, 'certs')
 
     config = configparser.ConfigParser()
     config.optionxform = str  # disable case transformation

@@ -5,8 +5,7 @@ import pytest
 
 @async_test
 def test_root(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     token = yield from backend.lookup_self()
@@ -15,8 +14,7 @@ def test_root(dev_server):
 
 @async_test
 def test_lookup(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     token = yield from backend.lookup(dev_server.root_token)
@@ -25,8 +23,7 @@ def test_lookup(dev_server):
 
 @async_test
 def test_root(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     token1 = yield from backend.create()
@@ -36,8 +33,7 @@ def test_root(dev_server):
 
 @async_test
 def test_renew(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     token = yield from backend.create(lease='1h')
@@ -46,8 +42,7 @@ def test_renew(dev_server):
 
 @async_test
 def test_revoke_prefix(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     token = yield from backend.create()
@@ -61,8 +56,7 @@ def test_revoke_prefix(dev_server):
 
 @async_test
 def test_revoke_cascade(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     parent_token = yield from backend.create()
@@ -83,8 +77,7 @@ def test_revoke_cascade(dev_server):
 
 @async_test
 def test_revoke_orphan(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
     parent_token = yield from backend.create()

@@ -5,8 +5,7 @@ import pytest
 
 @async_test
 def test_github_loading(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     response = yield from client.read('/sys/auth/github/login',
                                       params={"help": 1})
@@ -31,8 +30,7 @@ def test_github_loading(dev_server):
 
 @async_test
 def test_doc(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     response = yield from client.read('/sys/auth/github',
                                       params={"help": 1})
@@ -47,8 +45,7 @@ def test_github_loading(dev_server, env):
     except AttributeError:
         return 'GITHUB_ORG or GITHUB_TOKEN missing'
 
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
     added = yield from client.auth.add('github')
     assert added
 

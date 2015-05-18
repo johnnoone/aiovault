@@ -5,8 +5,7 @@ import pytest
 
 @async_test
 def test_raw(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     with pytest.raises(KeyError):
         yield from client.raw.read('foo')

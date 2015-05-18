@@ -5,8 +5,7 @@ import pytest
 
 @async_test
 def test_policy(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
     policies = yield from client.policy.items()
     assert 'root' in policies
     assert 'foo' not in policies

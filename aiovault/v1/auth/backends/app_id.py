@@ -7,7 +7,7 @@ from aiovault.util import format_policies, task
 class AppIDBackend(AuthBackend):
 
     @task
-    def login(self, app_id, user_id):
+    def login(self, *, app_id, user_id):
         """Returns information about the current client token.
 
         Parameters:

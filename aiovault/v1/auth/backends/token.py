@@ -8,7 +8,7 @@ from aiovault.util import task
 class TokenBackend(AuthBackend):
 
     @task
-    def login(self, token):
+    def login(self, *, token):
         raise NotImplementedError('Irrelevant operation')
 
     @asyncio.coroutine

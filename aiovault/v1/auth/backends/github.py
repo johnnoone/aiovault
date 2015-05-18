@@ -7,7 +7,7 @@ from aiovault.util import format_policies, task
 class GitHubBackend(AuthBackend):
 
     @task
-    def login(self, github_token):
+    def login(self, *, github_token):
         """Log with github.
         Parameters:
             github_token (str): a github token

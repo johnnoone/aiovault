@@ -5,8 +5,7 @@ import pytest
 
 @async_test
 def test_status(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     response = yield from client.status()
     assert response.initialized is True

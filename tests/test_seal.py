@@ -5,8 +5,7 @@ import pytest
 
 @async_test
 def test_initial_status(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     response = yield from client.seal.status()
     assert response.sealed == dev_server.sealed
@@ -17,8 +16,7 @@ def test_initial_status(dev_server):
 
 @async_test
 def test_seal(dev_server):
-    client = Vault(dev_server.addr,
-                   token=dev_server.root_token)
+    client = Vault(dev_server.addr, token=dev_server.root_token)
 
     status = yield from client.seal.status()
     assert status.sealed is False
