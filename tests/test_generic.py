@@ -30,4 +30,3 @@ def test_generic(dev_server):
 
     data = yield from store.delete('bar')
     assert data is True
-

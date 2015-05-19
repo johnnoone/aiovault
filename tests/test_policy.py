@@ -16,15 +16,12 @@ def test_policy(dev_server):
     absent = yield from client.policy.delete('foo')
     assert absent is True
 
-    # with pytest.raises(KeyError):
-    #     pass
-
     policy = yield from client.policy.read('root')
     assert policy.name == 'root'
 
     with pytest.raises(KeyError):
         yield from client.policy.read('foo')
-    
+
     rules = {
         'path': {
             'sys': {

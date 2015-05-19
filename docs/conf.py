@@ -160,3 +160,5 @@ texinfo_documents = [
      author, 'AIOVault', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+autodoc_member_order = 'bysource'

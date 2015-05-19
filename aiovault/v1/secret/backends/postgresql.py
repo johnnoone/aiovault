@@ -51,7 +51,7 @@ class PostgreSQLBackend(SecretBackend):
         return result
 
     @asyncio.coroutine
-    def get_role(self, name):
+    def read_role(self, name):
         """Queries the role definition.
 
         Parameters:
@@ -65,7 +65,7 @@ class PostgreSQLBackend(SecretBackend):
         return result
 
     @asyncio.coroutine
-    def put_role(self, name, sql):
+    def write_role(self, name, sql):
         """Creates or updates the role definition.
 
         Parameters:

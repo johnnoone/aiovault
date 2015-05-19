@@ -36,7 +36,7 @@ class ConsulBackend(SecretBackend):
         return result
 
     @asyncio.coroutine
-    def get_role(self, name):
+    def read_role(self, name):
         """Queries a Consul role definition.
 
         Parameters:
@@ -50,7 +50,7 @@ class ConsulBackend(SecretBackend):
         return result
 
     @asyncio.coroutine
-    def put_role(self, name, policy):
+    def write_role(self, name, policy):
         """Creates or updates the Consul role definition.
 
         Parameters:

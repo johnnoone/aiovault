@@ -29,9 +29,7 @@ class Request:
             certfile, keyfile = cert
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
             context.verify_mode = ssl.CERT_REQUIRED
-            # context.verify_mode = ssl.CERT_NONE
             context.load_cert_chain(certfile, keyfile)
-            # context.load_verify_locations("/etc/ssl/certs/ca-bundle.crt")
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
@@ -49,7 +47,6 @@ class Request:
             kwargs['data'] = json.dumps(data)
             headers = kwargs.setdefault('headers', {})
             headers['Content-Type'] = 'application/json'
-            print(kwargs['data'])
 
         response = yield from self.session.request(method, url, **kwargs)
 

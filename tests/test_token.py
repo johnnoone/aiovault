@@ -4,7 +4,7 @@ import pytest
 
 
 @async_test
-def test_root(dev_server):
+def test_lookup_1(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
@@ -13,7 +13,7 @@ def test_root(dev_server):
 
 
 @async_test
-def test_lookup(dev_server):
+def test_lookup_2(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
@@ -22,7 +22,7 @@ def test_lookup(dev_server):
 
 
 @async_test
-def test_root(dev_server):
+def test_lookup_3(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
     backend = yield from client.auth.load('token')
@@ -93,4 +93,3 @@ def test_revoke_orphan(dev_server):
     with pytest.raises(KeyError):
         yield from backend.lookup(parent_token)
     yield from backend.lookup(child_token)
-    

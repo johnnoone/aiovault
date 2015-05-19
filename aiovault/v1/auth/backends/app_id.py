@@ -1,6 +1,6 @@
 import asyncio
 from .bases import AuthBackend
-from aiovault.objects import WrittenToken
+from aiovault.objects import Value, WrittenToken
 from aiovault.util import format_policies, task
 
 
@@ -26,8 +26,32 @@ class AppIDBackend(AuthBackend):
         return WrittenToken(**result)
 
     @asyncio.coroutine
-    def create_app(self, app_id, *, policies=None, display_name=None):
-        """docstring for create_app_id"""
+    def read_app(self, app_id):
+        """Read app.
+
+        Parameters:
+            app_id (str): The application ID
+        Returns:
+            Value
+        """
+        app_id = getattr(app_id, 'id', app_id)
+        method = 'GET'
+        path = '/auth/%s/map/app-id/%s' % (self.name, app_id)
+        response = yield from self.req_handler(method, path)
+        result = yield from response.json()
+        return Value(**result)
+
+    @asyncio.coroutine
+    def write_app(self, app_id, *, policies=None, display_name=None):
+        """Write app.
+
+        Parameters:
+            app_id (str): The application ID
+            policies (str): The policies
+            display_name (str): The name to be displayed
+        Returns:
+            bool
+        """
         app_id = getattr(app_id, 'id', app_id)
         method = 'POST'
         path = '/auth/%s/map/app-id/%s' % (self.name, app_id)
@@ -40,8 +64,16 @@ class AppIDBackend(AuthBackend):
         return response.status == 204
 
     @asyncio.coroutine
-    def create_user(self, user, app_id, cidr_block=None):
-        """docstring for create_app_id"""
+    def write_user(self, user, app_id, cidr_block=None):
+        """Write user.
+
+        Parameters:
+            user (str): The user name
+            app_id (str): The application ID
+            cidr_block (str): The CIDR block to limit
+        Returns:
+            bool
+        """
         app_id = getattr(app_id, 'id', app_id)
         user = getattr(user, 'id', user)
         method = 'POST'

@@ -77,6 +77,7 @@ def load_login(type, backend, credentials):
             reasons.extend(error.errors)
         except Exception as err:
             logging.warn(err)
+            reasons.append(str(err))
 
     raise LoginError('Unable to login with these credentials',
                      credentials=credentials,

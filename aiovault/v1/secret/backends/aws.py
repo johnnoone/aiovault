@@ -53,7 +53,7 @@ class AWSBackend(SecretBackend):
         return result
 
     @asyncio.coroutine
-    def put_role(self, name, policy):
+    def write_role(self, name, policy):
         """Creates or updates a named role.
 
         Parameters:
@@ -69,7 +69,7 @@ class AWSBackend(SecretBackend):
         return result
 
     @asyncio.coroutine
-    def get_role(self, name):
+    def read_role(self, name):
         """Queries a named role.
 
         Parameters:

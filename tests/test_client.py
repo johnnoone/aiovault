@@ -1,4 +1,3 @@
-from aiovault import Vault
 from conftest import async_test
 import pytest
 

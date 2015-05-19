@@ -1,7 +1,6 @@
 from aiovault import Vault
 from conftest import async_test
 import pytest
-import time
 
 
 @async_test
@@ -15,17 +14,22 @@ def test_appid(dev_server):
     store = yield from client.auth.load('app-id')
     assert store.__repr__() == "<AppIDBackend(name='app-id')>"
 
-    created = yield from store.create_app('foo', policies=['dummy'])
+    created = yield from store.write_app('foo', policies=['dummy'])
     assert created
 
-    created = yield from store.create_user('bar', app_id='foo')
+    app = yield from store.read_app('foo')
+    assert app['key'] == 'foo'
+
+    created = yield from store.write_user('bar', app_id='foo')
     assert created
 
     # do login
     client = Vault(dev_server.addr)
 
     # login
-    result = yield from client.auth.login('app-id', app_id='foo', user_id='bar')
+    result = yield from client.auth.login('app-id',
+                                          app_id='foo',
+                                          user_id='bar')
     assert result['policies'] == ['dummy']
 
 

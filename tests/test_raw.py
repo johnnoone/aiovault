@@ -10,7 +10,8 @@ def test_raw(dev_server):
     with pytest.raises(KeyError):
         yield from client.raw.read('foo')
 
-    writed = yield from client.raw.write('foo', {'bar': 'baz'})
+    written = yield from client.raw.write('foo', {'bar': 'baz'})
+    assert written
 
     response = yield from client.raw.read('foo')
     print(response)

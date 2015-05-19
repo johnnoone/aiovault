@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from .bases import AuthBackend
+from aiovault.objects import WrittenToken
 from aiovault.request import Request
 from aiovault.util import task
 
@@ -19,6 +20,10 @@ class CertBackend(AuthBackend):
 
     @task
     def login(self, *, cert):
+        """
+        Returns:
+            WrittenToken
+        """
         method = 'POST'
         path = '/auth/%s/certs/login' % self.name
         if cert is True:
@@ -32,7 +37,8 @@ class CertBackend(AuthBackend):
                                   self.req_handler.token,
                                   cert)
         response = yield from req_handler(method, path)
-        print(response)
+        result = yield from response.json()
+        return WrittenToken(**result)
 
     @asyncio.coroutine
     def write_cert(self, name, *, certificate, display_name=None,

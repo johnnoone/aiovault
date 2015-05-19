@@ -11,7 +11,7 @@ class GitHubBackend(AuthBackend):
         """Log with github.
 
         Parameters:
-            github_token (str): a github token
+            github_token (str): GitHub personal API token
         Returns:
             WrittenToken
         """
@@ -24,12 +24,14 @@ class GitHubBackend(AuthBackend):
         return WrittenToken(**result)
 
     @asyncio.coroutine
-    def configure_organization(self, organization):
+    def configure(self, *, organization):
         """Configure github organization.
 
         Parameters:
             organization (str): The organization name a user must be a part of
                                 to authenticate
+        Returns:
+            bool
         """
         method = 'POST'
         path = '/auth/%s/config' % self.name
@@ -39,15 +41,17 @@ class GitHubBackend(AuthBackend):
         return response.status == 204
 
     @asyncio.coroutine
-    def configure_team(self, team, policies):
+    def write_team(self, name, policies):
         """Configure github team.
 
         Parameters:
-            team (str):
-            policies (str):
+            name (str): The team name
+            policies (str): The team policies
+        Returns:
+            bool
         """
         method = 'POST'
-        path = '/auth/%s/map/teams/%s' % (self.name, team)
+        path = '/auth/%s/map/teams/%s' % (self.name, name)
         policies = format_policies(policies)
         data = {'value': policies}
 

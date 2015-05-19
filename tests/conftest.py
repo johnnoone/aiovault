@@ -1,6 +1,5 @@
 import asyncio
 import configparser
-import json
 import logging
 import os
 import os.path
@@ -72,23 +71,27 @@ class DevServer:
             'root_token': extract(buf, 'Root Token: ([\w-]+)'),
         }
         env.setdefault('VAULT_ADDR', data['addr'])
+        proc_kwargs = {'stdout': PIPE,
+                       'stderr': PIPE,
+                       'env': env,
+                       'shell': False}
         for i in range(60):
-            with Popen(['vault', 'status'], stdout=PIPE, stderr=PIPE, env=env, shell=False) as sub:
+            with Popen(['vault', 'status'], **proc_kwargs) as sub:
                 stdout, stderr = sub.communicate(timeout=5)
-
                 if sub.returncode in (0, 1):
                     buf = stdout.decode('utf-8')
-                    data.update({
-                        'sealed': extract(buf, 'Sealed: (\w+)') == 'true',
-                        'shares': int(extract(buf, 'Key Shares: (\d+)')),
-                        'threshold': int(extract(buf, 'Key Threshold: (\d+)')),
-                        'progress': int(extract(buf, 'Unseal Progress: (\d+)')),
-                        'ha': extract(buf, 'High-Availability Enabled: (\w+)') == 'true',
-                    })
                     break
             sleep(1)
         else:
             raise Exception('Unable to start %s [%s]' % (self.name, proc.pid))
+
+        data.update({
+            'sealed': extract(buf, 'Sealed: (\w+)') == 'true',
+            'shares': int(extract(buf, 'Key Shares: (\d+)')),
+            'threshold': int(extract(buf, 'Key Threshold: (\d+)')),
+            'progress': int(extract(buf, 'Unseal Progress: (\d+)')),
+            'ha': extract(buf, 'High-Availability Enabled: (\w+)') == 'true',
+        })
 
         self._data = Namespace()
         self._data.update(data)
