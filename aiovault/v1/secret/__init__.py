@@ -57,7 +57,7 @@ class SecretEndpoint:
         data = {'type': type,
                 'description': description}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
     def unmount(self, name):

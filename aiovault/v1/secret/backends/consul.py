@@ -1,5 +1,7 @@
 import asyncio
 from .bases import SecretBackend
+from aiovault.objects import Value
+from base64 import b64encode
 
 
 class ConsulBackend(SecretBackend):
@@ -19,6 +21,8 @@ class ConsulBackend(SecretBackend):
                            provided as scheme://host:port
             token (str): The Consul ACL token to use.
                          Must be a management type token.
+        Results:
+            bool
         """
         method = 'POST'
         path = '/%s/config/access' % self.name
@@ -32,8 +36,7 @@ class ConsulBackend(SecretBackend):
                 'scheme': scheme}
 
         response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def read_role(self, name):
@@ -41,13 +44,15 @@ class ConsulBackend(SecretBackend):
 
         Parameters:
             name (str): The role name
+        Results:
+            Value
         """
         method = 'GET'
         path = '/%s/roles/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result
+        return Value(**result)
 
     @asyncio.coroutine
     def write_role(self, name, policy):
@@ -55,15 +60,16 @@ class ConsulBackend(SecretBackend):
 
         Parameters:
             name (str): The role name
-            policy (str): The base64 encoded Consul ACL policy.
+            policy (str): The Consul ACL policy.
+        Returns:
+            bool
         """
         method = 'POST'
         path = '/%s/roles/%s' % (self.name, name)
-        data = {'policy': policy}
+        data = {'policy': b64encode(policy)}
 
         response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def delete_role(self, name):
@@ -71,13 +77,14 @@ class ConsulBackend(SecretBackend):
 
         Parameters:
             name (str): The role name
+        Returns:
+            bool
         """
         method = 'DELETE'
         path = '/%s/roles/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def creds(self, name):
@@ -85,10 +92,12 @@ class ConsulBackend(SecretBackend):
 
         Parameters:
             name (str): The role name
+        Results:
+            Value
         """
         method = 'GET'
         path = '/%s/creds/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result
+        return Value(**result)
