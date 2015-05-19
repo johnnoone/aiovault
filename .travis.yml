@@ -6,7 +6,8 @@ python:
 
 env:
   global:
-    - MYSQL_DSN=root:@tcp(127.0.0.1:3306)/
+    - MYSQL_DSN='root:@tcp(127.0.0.1:3306)/'
+    - PG_URL='user=postgres dbname=postgres sslmode=disable'
 
 install:
   - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y install rsyslog

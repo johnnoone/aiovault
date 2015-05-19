@@ -1,5 +1,7 @@
 import asyncio
 from .bases import SecretBackend
+from aiovault.exceptions import InvalidPath
+from aiovault.objects import Value
 
 
 class PostgreSQLBackend(SecretBackend):
@@ -9,23 +11,22 @@ class PostgreSQLBackend(SecretBackend):
         self.req_handler = req_handler
 
     @asyncio.coroutine
-    def config_connection(self, connection, value):
+    def config_connection(self, *, dsn):
         """Configures the connection string used
         to communicate with PostgreSQL.
 
         This is a root protected endpoint.
 
         Parameters:
-            value (str): The PostgreSQL connection URL or PG
-                         style string. e.g. "user=foo host=bar"
+            dsn (str): The PostgreSQL connection URL or PG style string.
+                       e.g. "user=foo host=bar"
         """
         method = 'POST'
         path = '/%s/config/connection' % self.name
-        data = {'value': value}
+        data = {'value': dsn}
 
-        response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return result
+        response = yield from self.req_handler(method, path, json=data)
+        return response.status == 204
 
     @asyncio.coroutine
     def config_lease(self, lease, lease_max):
@@ -46,9 +47,8 @@ class PostgreSQLBackend(SecretBackend):
         data = {'lease': lease,
                 'lease_max': lease_max}
 
-        response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return result
+        response = yield from self.req_handler(method, path, json=data)
+        return response.status == 204
 
     @asyncio.coroutine
     def read_role(self, name):
@@ -60,9 +60,12 @@ class PostgreSQLBackend(SecretBackend):
         method = 'GET'
         path = '/%s/roles/%s' % (self.name, name)
 
-        response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        try:
+            response = yield from self.req_handler(method, path)
+            result = yield from response.json()
+            return Value(**result)
+        except InvalidPath:
+            raise KeyError('%r does not exists' % name)
 
     @asyncio.coroutine
     def write_role(self, name, sql):
@@ -78,9 +81,8 @@ class PostgreSQLBackend(SecretBackend):
         path = '/%s/roles/%s' % (self.name, name)
         data = {'sql': sql}
 
-        response = yield from self.req_handler(method, path, data=data)
-        result = yield from response.json()
-        return result
+        response = yield from self.req_handler(method, path, json=data)
+        return response.status == 204
 
     @asyncio.coroutine
     def delete_role(self, name):
@@ -93,8 +95,7 @@ class PostgreSQLBackend(SecretBackend):
         path = '/%s/roles/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def creds(self, name):
@@ -108,4 +109,4 @@ class PostgreSQLBackend(SecretBackend):
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result
+        return Value(**result)
