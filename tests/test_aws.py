@@ -50,6 +50,8 @@ def test_basic(dev_server, env):
     assert 'access_key' in data
     assert 'secret_key' in data
 
+    # TODO destroy the new account with boto
+
 
 @async_test
 def test_crud(dev_server, env):

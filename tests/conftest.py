@@ -1,5 +1,6 @@
 import asyncio
 import configparser
+import json
 import logging
 import os
 import os.path
@@ -33,7 +34,7 @@ def extract(src, pattern):
     return re.search(pattern, src).group(1)
 
 
-class DevServer:
+class Vault:
     def __init__(self, name):
         self.name = name
         self._proc = None
@@ -106,9 +107,72 @@ class DevServer:
         return result
 
 
+class Consul(object):
+    def __init__(self, name, config_file, server=False, leader=False):
+        self.name = name
+        self.config_file = config_file
+        self.server = server
+        self.leader = leader
+        self._proc = None
+
+    @property
+    def config(self):
+        with open(self.config_file) as file:
+            response = Namespace()
+            response.update({'address': '127.0.0.1:8500'})
+            response.update(json.load(file))
+            return response
+
+    def start(self):
+        if self._proc:
+            raise Exception('Node %s is already running' % self.name)
+
+        # reset tmp store
+        Popen(['rm', '-rf', self.config.data_dir]).communicate()
+
+        env = os.environ.copy()
+        env.setdefault('GOMAXPROCS', '2')
+        proc = Popen(['consul', 'agent', '-config-file=%s' % self.config_file],
+                     stdout=PIPE, stderr=PIPE, env=env, shell=False)
+        self._proc = proc
+        print('Starting %s [%s]' % (self.name, proc.pid))
+        for i in range(60):
+            with Popen(['consul', 'info'], stdout=PIPE, stderr=PIPE) as sub:
+                stdout, stderr = sub.communicate(timeout=5)
+                if self.leader:
+                    if 'leader = true' in stdout.decode('utf-8'):
+                        break
+                elif self.server:
+                    if 'server = true' in stdout.decode('utf-8'):
+                        break
+                elif not sub.returncode:
+                    break
+            sleep(1)
+        else:
+            raise Exception('Unable to start %s [%s]' % (self.name, proc.pid))
+        print('Node %s [%s] is ready to rock' % (self.name, proc.pid))
+
+    def stop(self):
+        if not self._proc:
+            raise Exception('Node %s is not running' % self.name)
+        print('Halt %s [%s]' % (self.name, self._proc.pid))
+        result = self._proc.terminate()
+        self._proc = None
+        return result
+
+
+@pytest.fixture(scope='function', autouse=False)
+def consul(request):
+    config_file = os.path.join(HERE, 'consul-server.json')
+    server = Consul('leader', config_file, True, True)
+    server.start()
+    request.addfinalizer(server.stop)
+    return server.config
+
+
 @pytest.fixture(scope='function', autouse=False)
 def dev_server(request):
-    server = DevServer('leader')
+    server = Vault('leader')
     server.start()
     request.addfinalizer(server.stop)
     return server.config

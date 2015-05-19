@@ -1,0 +1,9 @@
+{
+  "bootstrap_expect": 1,
+  "data_dir": "/tmp/consul/server",
+  "node_name": "my-local-node",
+  "server": true,
+	"datacenter": "test",
+	"acl_datacenter": "test",
+	"acl_master_token": "test"
+}

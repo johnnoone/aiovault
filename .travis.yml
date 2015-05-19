@@ -3,6 +3,11 @@ python:
   - "3.3"
   - "3.4"
   # - nightly
+
+env:
+  global:
+    - MYSQL_DSN=root:@tcp(127.0.0.1:3306)/
+
 install:
   - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y install rsyslog
   - pip install -r requirements-tests.txt --use-mirrors

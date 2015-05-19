@@ -1,5 +1,6 @@
 import asyncio
 from .bases import SecretBackend
+from aiovault.exceptions import InvalidPath, InvalidRequest
 from aiovault.objects import Value
 from base64 import b64encode
 
@@ -35,7 +36,7 @@ class ConsulBackend(SecretBackend):
                 'token': token,
                 'scheme': scheme}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
     @asyncio.coroutine
@@ -50,12 +51,15 @@ class ConsulBackend(SecretBackend):
         method = 'GET'
         path = '/%s/roles/%s' % (self.name, name)
 
-        response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return Value(**result)
+        try:
+            response = yield from self.req_handler(method, path)
+            result = yield from response.json()
+            return Value(**result)
+        except (InvalidPath, InvalidRequest):
+            raise KeyError('%r does not exists' % name)
 
     @asyncio.coroutine
-    def write_role(self, name, policy):
+    def write_role(self, name, *, policy):
         """Creates or updates the Consul role definition.
 
         Parameters:
@@ -66,9 +70,9 @@ class ConsulBackend(SecretBackend):
         """
         method = 'POST'
         path = '/%s/roles/%s' % (self.name, name)
-        data = {'policy': b64encode(policy)}
+        data = {'policy': b64encode(policy.encode('utf-8')).decode('utf-8')}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
     @asyncio.coroutine
