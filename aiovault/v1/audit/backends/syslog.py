@@ -16,5 +16,5 @@ class SyslogBackend(AuditBackend):
         return {
             'facility': facility,
             'tag': tag,
-            'log_raw': log_raw
+            'log_raw': 'true' if log_raw else 'false'
         }

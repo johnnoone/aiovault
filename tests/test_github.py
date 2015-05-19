@@ -22,7 +22,7 @@ def test_github_raw_loading(dev_server):
 
     # high level create/delete
 
-    response = yield from client.auth.add('github')
+    response = yield from client.auth.enable('github')
     assert response is True, 'Must add github auth backend'
     response = yield from client.auth.delete('github')
     assert response is True, 'Must delete github auth backend'
@@ -47,10 +47,10 @@ def test_github_loading(dev_server, env):
         return 'GITHUB_ORG or GITHUB_TOKEN missing'
 
     client = Vault(dev_server.addr, token=dev_server.root_token)
-    added = yield from client.auth.add('github')
+    added = yield from client.auth.enable('github')
     assert added
 
-    store = yield from client.auth.load('github')
+    store = yield from client.auth.get('github')
     configured = yield from store.configure(organization=github_org)
     assert configured
 

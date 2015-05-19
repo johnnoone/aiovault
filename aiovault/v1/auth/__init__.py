@@ -27,25 +27,27 @@ class AuthEndpoint:
         return result
 
     @asyncio.coroutine
-    def load(self, name):
+    def get(self, name):
+        """Returns auth backend.
+
+        Parameters:
+            name (str): The auth backend name
+        Returns
+            dict
+        """
         method = 'GET'
         path = '/sys/auth'
 
-        if name.endswith('/'):
-            mount, name = name, name[:-1]
-        else:
-            mount = name + '/'
-
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        data = result[mount]
+        data = result['%s/' % name]
         return load_backend(data['type'], {
             'name': name,
             'req_handler': self.req_handler
         })
 
     @asyncio.coroutine
-    def add(self, name, *, type=None, description=None):
+    def enable(self, name, *, type=None, description=None):
         """Enable a new auth backend.
 
         The auth backend can be accessed and configured via the mount

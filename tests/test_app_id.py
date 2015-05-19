@@ -8,10 +8,10 @@ def test_appid(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
     # enable app-id
-    response = yield from client.auth.add('app-id')
+    response = yield from client.auth.enable('app-id')
     assert response
 
-    store = yield from client.auth.load('app-id')
+    store = yield from client.auth.get('app-id')
     assert store.__repr__() == "<AppIDBackend(name='app-id')>"
 
     created = yield from store.write_app('foo', policies=['dummy'])

@@ -8,10 +8,10 @@ def test_userpass(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
     # enable userpass
-    response = yield from client.auth.add('userpass')
+    response = yield from client.auth.enable('userpass')
     assert response
 
-    auth = yield from client.auth.load('userpass')
+    auth = yield from client.auth.get('userpass')
 
     response = yield from auth.create('mitchellh', 'foo')
     assert response

@@ -20,7 +20,7 @@ class SecretEndpoint:
                                type=data['type'],
                                req_handler=self.req_handler)
 
-    def load(self, name):
+    def get(self, name):
         """Get a backend by its name
 
         Parameters:

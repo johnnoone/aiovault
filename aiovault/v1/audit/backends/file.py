@@ -15,5 +15,5 @@ class FileBackend(AuditBackend):
         """
         return {
             'path': path,
-            'log_raw': log_raw
+            'log_raw': 'true' if log_raw else 'false'
         }

@@ -65,7 +65,7 @@ class Request:
             raise InternalServerError(data)
         if response.status == 503:
             raise DownError(data)
-        raise HTTPError(data)
+        raise HTTPError(data, response.status)
 
     __call__ = request
 

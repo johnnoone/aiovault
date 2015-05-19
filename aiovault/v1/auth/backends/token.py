@@ -1,15 +1,13 @@
 import asyncio
-from .bases import AuthBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import ReadToken, WrittenToken
-from aiovault.util import task
 
 
-class TokenBackend(AuthBackend):
+class TokenBackend:
 
-    @task
-    def login(self, *, token):
-        raise NotImplementedError('Irrelevant operation')
+    def __init__(self, name, req_handler):
+        self.name = name
+        self.req_handler = req_handler
 
     @asyncio.coroutine
     def create(self, *, id=None, policies=None, metadata=None, no_parent=None,
