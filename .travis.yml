@@ -12,6 +12,7 @@ env:
 install:
   - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y install rsyslog
   - pip install -r requirements-tests.txt --use-mirrors
+  - pip install python-coveralls --use-mirrors
   - python setup.py develop
   - wget https://dl.bintray.com/mitchellh/consul/0.5.0_linux_amd64.zip
   - unzip 0.5.0_linux_amd64.zip
@@ -20,4 +21,6 @@ install:
 before_script:
   - export PATH=$PATH:$PWD
 script:
-  - py.test
+  - py.test --pep8 aiovault -v --cov aiovault --cov-report term-missing
+after_success:
+  - coveralls
