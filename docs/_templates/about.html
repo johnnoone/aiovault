@@ -1,0 +1,10 @@
+{% include "!about.html" %}
+
+{% set path = theme_github_user + '/' + theme_github_repo %}
+
+<a href="https://coveralls.io/r/{{ path }}">
+  <img
+    alt="https://coveralls.io/repos/{{ path }}/badge.svg"
+    src="https://coveralls.io/repos/{{ path }}/badge.svg"
+  >
+</a>
