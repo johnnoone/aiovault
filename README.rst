@@ -8,10 +8,25 @@ Install
     pip install .
 
 
+Usage
+-----
+
+::
+
+    from aiovault import Vault
+    client = Vault('127.0.0.1:8200')
+    result = yield from client.auth.login('userpass',
+                                          username='mitchellh',
+                                          password='foo')
+
+
+
 Testing
 -------
 
 ::
+
+    pip install -r requirements-tests.txt --use-mirrors
     py.test  --cov-report html --cov aiovault tests
 
 
@@ -27,15 +42,6 @@ Install MySQL::
 In another window::
 
     /opt/local/lib/mysql56/bin/mysqladmin -u root password 'new-password'
-
-
-Testing locally
----------------
-
-::
-
-    pip install -r requirements-tests.txt --use-mirrors
-    py.test  --cov-report html --cov aiovault tests
 
 
 Setup postgres with macport
