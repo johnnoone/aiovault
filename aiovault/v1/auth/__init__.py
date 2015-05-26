@@ -1,5 +1,14 @@
+"""
+    auth
+    ~~~~
+
+"""
+
 import asyncio
 from .backends import load_backend, load_login
+from collections.abc import Mapping
+
+__all__ = ['AuthEndpoint', 'AuthCollection']
 
 
 class AuthEndpoint:
@@ -18,13 +27,16 @@ class AuthEndpoint:
     @asyncio.coroutine
     def items(self):
         """Lists all the enabled auth backends.
+
+        Returns:
+            AuthCollection
         """
         method = 'GET'
         path = '/sys/auth'
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result
+        return AuthCollection(result, self.req_handler)
 
     @asyncio.coroutine
     def get(self, name):
@@ -35,6 +47,7 @@ class AuthEndpoint:
         Returns
             dict
         """
+        name = getattr(name, 'name', name)
         method = 'GET'
         path = '/sys/auth'
 
@@ -82,3 +95,28 @@ class AuthEndpoint:
 
         response = yield from self.req_handler(method, path)
         return response.status == 204
+
+
+class AuthCollection(Mapping):
+
+    def __init__(self, backends, req_handler):
+        self.backends = backends
+        self.req_handler = req_handler
+
+    def __getitem__(self, name):
+        path = '%s/' % name
+        return load_backend(self.backends[path]['type'], {
+            'name': name,
+            'req_handler': self.req_handler
+        })
+
+    def __iter__(self):
+        for key in self.backends.keys():
+            yield key[:-1]
+
+    def __len__(self):
+        return len(self.backends)
+
+    def __repr__(self):
+        data = tuple(self.backends.keys())
+        return '<AuthCollection{!r}>'.format(data)

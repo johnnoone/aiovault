@@ -5,6 +5,8 @@ omit =
 [report]
 exclude_lines =
     pragma: no cover
+    def __iter__
+    def __len__
     def __repr__
     raise NotImplementedError
     if __name__ == .__main__.:

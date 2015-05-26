@@ -76,9 +76,6 @@ class Value(MutableMapping):
             other == other.data
         return self.data == other
 
-    def __hasitem__(self, name):
-        return self.data[name]
-
     def __getitem__(self, name):
         return self.data[name]
 

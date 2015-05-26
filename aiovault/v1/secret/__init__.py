@@ -1,4 +1,13 @@
+"""
+    secret
+    ~~~~~~
+
+"""
+
 from .backends import load_backend
+from collections.abc import Mapping
+
+__all__ = ['AuthEndpoint', 'SecretCollection']
 
 
 class SecretEndpoint:
@@ -8,6 +17,9 @@ class SecretEndpoint:
 
     def items(self):
         """Lists all the mounted secret backends.
+
+        Returns:
+            SecretCollection
         """
         method = 'GET'
         path = '/sys/mounts'
@@ -15,10 +27,9 @@ class SecretEndpoint:
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
 
-        for name, data in result.items():
-            yield load_backend(name=name,
-                               type=data['type'],
-                               req_handler=self.req_handler)
+        response = yield from self.req_handler(method, path)
+        result = yield from response.json()
+        return SecretCollection(result, self.req_handler)
 
     def get(self, name):
         """Get a backend by its name
@@ -30,17 +41,13 @@ class SecretEndpoint:
         method = 'GET'
         path = '/sys/mounts'
 
-        if name.endswith('/'):
-            a, b = name, name[:-1]
-        else:
-            a, b = name + '/', name
-
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        backend_type = result[a]['type']
-        return load_backend(name=b,
-                            type=backend_type,
-                            req_handler=self.req_handler)
+        data = result['%s/' % name]
+        return load_backend(data['type'], {
+            'name': name,
+            'req_handler': self.req_handler
+        })
 
     def mount(self, name, *, type=None, description=None):
         """Mount a new secret backend.
@@ -87,6 +94,31 @@ class SecretEndpoint:
         data = {'from': src,
                 'to': dest}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
         return result
+
+
+class SecretCollection(Mapping):
+
+    def __init__(self, backends, req_handler):
+        self.backends = backends
+        self.req_handler = req_handler
+
+    def __getitem__(self, name):
+        path = '%s/' % name
+        return load_backend(self.backends[path]['type'], {
+            'name': name,
+            'req_handler': self.req_handler
+        })
+
+    def __iter__(self):
+        for key in self.backends.keys():
+            yield key[:-1]
+
+    def __len__(self):
+        return len(self.backends)
+
+    def __repr__(self):
+        data = tuple(self.backends.keys())
+        return '<AuthCollection{!r}>'.format(data)

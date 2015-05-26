@@ -1,3 +1,9 @@
+"""
+    secret.backends
+    ~~~~~~~~~~~~~~~
+
+"""
+
 from .aws import AWSBackend
 from .consul import ConsulBackend
 from .generic import GenericBackend
@@ -11,19 +17,17 @@ __all__ = ['AWSBackend', 'ConsulBackend', 'PostgreSQLBackend',
            'load_backend']
 
 
-def load_backend(type, name, *args, **kwargs):
+def load_backend(type, backend):
     """Load secret backend.
 
     Parameters:
         type (str): The backend type
-        name (str): The backend name
+        backend (str): The backend init variables
     """
-    kwargs.setdefault('name', name)
     mgr = driver.DriverManager(
         namespace='aiovault.secret.backend',
         name=type,
         invoke_on_load=True,
-        invoke_args=args,
-        invoke_kwds=kwargs
+        invoke_kwds=backend
     )
     return mgr.driver

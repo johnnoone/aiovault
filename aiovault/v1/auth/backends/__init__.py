@@ -1,3 +1,9 @@
+"""
+    auth.backends
+    ~~~~~~~~~~~~~
+
+"""
+
 import asyncio
 import logging
 from .app_id import AppIDBackend
