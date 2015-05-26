@@ -1,7 +1,7 @@
-import asyncio
 from abc import ABCMeta
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
+from aiovault.util import task
 
 
 class SecretBackend(metaclass=ABCMeta):
@@ -10,7 +10,7 @@ class SecretBackend(metaclass=ABCMeta):
         self.name = name
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def read(self, key):
         """Reads the value of the key at the given path.
 
@@ -29,7 +29,7 @@ class SecretBackend(metaclass=ABCMeta):
         except InvalidPath:
             raise KeyError('%r does not exists' % key)
 
-    @asyncio.coroutine
+    @task
     def write(self, key, values):
         """Update the value of the key at the given path.
 
@@ -48,7 +48,7 @@ class SecretBackend(metaclass=ABCMeta):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def delete(self, key):
         """Ensure that key is absent with given path.
 

@@ -1,6 +1,6 @@
-import asyncio
 from . import v1
 from .request import Request
+from .util import task
 
 
 class Vault(v1.SysEndpoint):
@@ -37,19 +37,19 @@ class Vault(v1.SysEndpoint):
     def secret(self):
         return v1.SecretEndpoint(self.req_handler)
 
-    @asyncio.coroutine
+    @task
     def read(self, path, **kwargs):
         method = kwargs.pop('method', 'GET')
         response = yield from self.req_handler(method, path, **kwargs)
         return response
 
-    @asyncio.coroutine
+    @task
     def write(self, path, **kwargs):
         method = kwargs.pop('method', 'POST')
         response = yield from self.req_handler(method, path, **kwargs)
         return response
 
-    @asyncio.coroutine
+    @task
     def delete(self, path, **kwargs):
         method = kwargs.pop('method', 'DELETE')
         response = yield from self.req_handler(method, path, **kwargs)

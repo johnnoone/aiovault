@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from .bases import AuthBackend
 from aiovault.objects import WrittenToken
@@ -40,7 +39,7 @@ class CertBackend(AuthBackend):
         result = yield from response.json()
         return WrittenToken(**result)
 
-    @asyncio.coroutine
+    @task
     def write_cert(self, name, *, certificate, display_name=None,
                    policies=None, lease=None):
         """Write certificate
@@ -64,7 +63,7 @@ class CertBackend(AuthBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def read_cert(self, name):
         """Read certificate
 
@@ -78,7 +77,7 @@ class CertBackend(AuthBackend):
         result = yield from response.json()
         return result
 
-    @asyncio.coroutine
+    @task
     def delete_cert(self, name):
         """Delete certificate
 

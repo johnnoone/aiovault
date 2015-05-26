@@ -1,6 +1,6 @@
-import asyncio
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import ReadToken, WrittenToken
+from aiovault.util import task
 
 
 class TokenBackend:
@@ -9,7 +9,7 @@ class TokenBackend:
         self.name = name
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def create(self, *, id=None, policies=None, metadata=None, no_parent=None,
                lease=None, display_name=None, num_uses=None):
         """Creates a new token.
@@ -55,7 +55,7 @@ class TokenBackend:
         result = yield from response.json()
         return WrittenToken(**result)
 
-    @asyncio.coroutine
+    @task
     def lookup_self(self):
         """Returns information about the current client token.
 
@@ -69,7 +69,7 @@ class TokenBackend:
         result = yield from response.json()
         return ReadToken(**result)
 
-    @asyncio.coroutine
+    @task
     def lookup(self, token):
         """Returns information about a client token.
 
@@ -89,7 +89,7 @@ class TokenBackend:
         except InvalidPath:
             raise KeyError('%r does not exists' % token)
 
-    @asyncio.coroutine
+    @task
     def revoke(self, token):
         """Revokes a token and all child tokens.
 
@@ -107,7 +107,7 @@ class TokenBackend:
         result = yield from response.json()
         return result
 
-    @asyncio.coroutine
+    @task
     def revoke_orphan(self, token):
         """Revokes a token but not its child tokens.
 
@@ -126,7 +126,7 @@ class TokenBackend:
         result = yield from response.json()
         return result
 
-    @asyncio.coroutine
+    @task
     def revoke_prefix(self, prefix):
         """Revokes all tokens generated at a given prefix, along with child
         tokens, and all secrets generated using those tokens. Uses include
@@ -142,7 +142,7 @@ class TokenBackend:
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def renew(self, token, increment=None):
         """Renews a lease associated with a token.
 

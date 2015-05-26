@@ -1,7 +1,7 @@
-import asyncio
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
+from aiovault.util import task
 
 
 class PostgreSQLBackend(SecretBackend):
@@ -10,7 +10,7 @@ class PostgreSQLBackend(SecretBackend):
         self.name = name
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def config_connection(self, *, dsn):
         """Configures the connection string used
         to communicate with PostgreSQL.
@@ -28,7 +28,7 @@ class PostgreSQLBackend(SecretBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def config_lease(self, lease, lease_max):
         """Configures the lease settings for generated credentials.
 
@@ -50,7 +50,7 @@ class PostgreSQLBackend(SecretBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def read_role(self, name):
         """Queries the role definition.
 
@@ -67,7 +67,7 @@ class PostgreSQLBackend(SecretBackend):
         except InvalidPath:
             raise KeyError('%r does not exists' % name)
 
-    @asyncio.coroutine
+    @task
     def write_role(self, name, sql):
         """Creates or updates the role definition.
 
@@ -84,7 +84,7 @@ class PostgreSQLBackend(SecretBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def delete_role(self, name):
         """Deletes the role definition.
 
@@ -97,7 +97,7 @@ class PostgreSQLBackend(SecretBackend):
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def creds(self, name):
         """Generates a new set of dynamic credentials based on the named role.
 

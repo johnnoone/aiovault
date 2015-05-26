@@ -1,8 +1,7 @@
-import asyncio
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath, InvalidRequest
 from aiovault.objects import Value
-from aiovault.util import base64_encode
+from aiovault.util import base64_encode, task
 
 
 class ConsulBackend(SecretBackend):
@@ -11,7 +10,7 @@ class ConsulBackend(SecretBackend):
         self.name = name
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def config_access(self, address, token):
         """Configures the access information for Consul.
 
@@ -39,7 +38,7 @@ class ConsulBackend(SecretBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def read_role(self, name):
         """Queries a Consul role definition.
 
@@ -58,7 +57,7 @@ class ConsulBackend(SecretBackend):
         except (InvalidPath, InvalidRequest):
             raise KeyError('%r does not exists' % name)
 
-    @asyncio.coroutine
+    @task
     def write_role(self, name, *, policy):
         """Creates or updates the Consul role definition.
 
@@ -75,7 +74,7 @@ class ConsulBackend(SecretBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def delete_role(self, name):
         """Deletes a Consul role definition.
 
@@ -90,7 +89,7 @@ class ConsulBackend(SecretBackend):
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def creds(self, name):
         """Generates a dynamic Consul token based on the role definition.
 

@@ -1,4 +1,3 @@
-import asyncio
 from .bases import AuthBackend
 from aiovault.objects import Value, WrittenToken
 from aiovault.util import format_policies, task
@@ -25,7 +24,7 @@ class AppIDBackend(AuthBackend):
         result = yield from response.json()
         return WrittenToken(**result)
 
-    @asyncio.coroutine
+    @task
     def read_app(self, app_id):
         """Read app.
 
@@ -41,7 +40,7 @@ class AppIDBackend(AuthBackend):
         result = yield from response.json()
         return Value(**result)
 
-    @asyncio.coroutine
+    @task
     def write_app(self, app_id, *, policies=None, display_name=None):
         """Write app.
 
@@ -63,7 +62,7 @@ class AppIDBackend(AuthBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def write_user(self, user, app_id, cidr_block=None):
         """Write user.
 

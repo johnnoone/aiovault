@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Policy
-from aiovault.util import suppress
+from aiovault.util import suppress, task
 
 
 class PolicyEndpoint:
@@ -9,6 +9,7 @@ class PolicyEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @task
     def items(self):
         """Lists all the available policies.
         """
@@ -19,6 +20,7 @@ class PolicyEndpoint:
         result = yield from response.json()
         return result['policies']
 
+    @task
     def read(self, name):
         """Fetch one policy by its name.
 
@@ -39,6 +41,7 @@ class PolicyEndpoint:
         except InvalidPath:
             raise KeyError('%r does not exists' % name)
 
+    @task
     def write(self, name, rules):
         """Add or update a policy.
 
@@ -58,6 +61,7 @@ class PolicyEndpoint:
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
+    @task
     def delete(self, name):
         """Delete the policy with the given name.
 

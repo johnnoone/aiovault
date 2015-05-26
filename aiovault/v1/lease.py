@@ -1,9 +1,12 @@
+from aiovault.util import task
+
 
 class LeaseEndpoint:
 
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @task
     def renew(self, lease_id, increment=None):
         """Renew a secret, requesting to extend the lease.
 
@@ -20,6 +23,7 @@ class LeaseEndpoint:
         result = yield from response.json()
         return result
 
+    @task
     def revoke(self, lease_id):
         """Revoke a secret immediately.
 
@@ -33,6 +37,7 @@ class LeaseEndpoint:
         result = yield from response.json()
         return result
 
+    @task
     def revoke_prefix(self, path_prefix):
         """Revoke all secrets generated under a given prefix immediately.
 

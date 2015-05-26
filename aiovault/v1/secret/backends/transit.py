@@ -1,8 +1,7 @@
-import asyncio
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import base64_encode, base64_decode
+from aiovault.util import base64_encode, base64_decode, task
 
 
 class TransitBackend(SecretBackend):
@@ -11,7 +10,7 @@ class TransitBackend(SecretBackend):
         self.name = name
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def read_key(self, name):
         """Returns information about a named encryption key.
 
@@ -32,7 +31,7 @@ class TransitBackend(SecretBackend):
         except InvalidPath:
             raise KeyError('%r does not exists' % name)
 
-    @asyncio.coroutine
+    @task
     def write_key(self, name):
         """Creates a new named encryption key.
 
@@ -49,7 +48,7 @@ class TransitBackend(SecretBackend):
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def delete_key(self, name):
         """Deletes a named encryption key.
 
@@ -67,7 +66,7 @@ class TransitBackend(SecretBackend):
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def encrypt(self, key, plaintext):
         """Encrypts the provided plaintext using the named key.
 
@@ -85,7 +84,7 @@ class TransitBackend(SecretBackend):
         result = yield from response.json()
         return Value(**result)
 
-    @asyncio.coroutine
+    @task
     def decrypt(self, key, ciphertext):
         """Decrypts the provided ciphertext using the named key.
 

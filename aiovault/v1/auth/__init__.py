@@ -4,9 +4,9 @@
 
 """
 
-import asyncio
 from .backends import load_backend, load_login
 from collections.abc import Mapping
+from aiovault.util import task
 
 __all__ = ['AuthEndpoint', 'AuthCollection']
 
@@ -16,7 +16,7 @@ class AuthEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def login(self, endpoint, **credentials):
         res = load_login(endpoint, {
             'name': endpoint,
@@ -24,7 +24,7 @@ class AuthEndpoint:
         }, credentials)
         return res
 
-    @asyncio.coroutine
+    @task
     def items(self):
         """Lists all the enabled auth backends.
 
@@ -38,7 +38,7 @@ class AuthEndpoint:
         result = yield from response.json()
         return AuthCollection(result, self.req_handler)
 
-    @asyncio.coroutine
+    @task
     def get(self, name):
         """Returns auth backend.
 
@@ -59,7 +59,7 @@ class AuthEndpoint:
             'req_handler': self.req_handler
         })
 
-    @asyncio.coroutine
+    @task
     def enable(self, name, *, type=None, description=None):
         """Enable a new auth backend.
 
@@ -83,7 +83,7 @@ class AuthEndpoint:
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def delete(self, name):
         """Disable the auth backend at the given mount point.
 

@@ -1,5 +1,5 @@
-import asyncio
 from .backends import load_backend
+from aiovault.util import task
 
 
 class AuditEndpoint:
@@ -13,7 +13,7 @@ class AuditEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def enable(self, name, *, type=None, description=None, **options):
         """Enable an audit backend.
 
@@ -37,7 +37,7 @@ class AuditEndpoint:
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def disable(self, name):
         """Disable the given audit backend.
 
@@ -52,7 +52,7 @@ class AuditEndpoint:
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def get(self, name):
         """Returns audit backend.
 
@@ -64,7 +64,7 @@ class AuditEndpoint:
         results = yield from self.items()
         return results['%s/' % name]
 
-    @asyncio.coroutine
+    @task
     def items(self):
         """Disable the given audit backend.
         """

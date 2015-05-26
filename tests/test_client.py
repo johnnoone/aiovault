@@ -10,7 +10,7 @@ def test_auth(dev_server):
     backends = yield from client.auth.items()
     assert len(backends) == 1
 
-    response = yield from client.auth.enable('app-id')
+    yield from client.auth.enable('app-id')
     backends = yield from client.auth.items()
     assert len(backends) == 2
     assert 'app-id' in backends
@@ -34,6 +34,6 @@ def test_secret(dev_server):
     assert len(backends) == 3
     assert 'newpath' in backends
 
-    response = yield from client.secret.unmount('newpath')
+    yield from client.secret.unmount('newpath')
     backends = yield from client.secret.items()
     assert len(backends) == 2

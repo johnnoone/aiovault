@@ -1,4 +1,3 @@
-import asyncio
 from .bases import AuthBackend
 from aiovault.objects import WrittenToken
 from aiovault.util import format_policies, task
@@ -23,7 +22,7 @@ class GitHubBackend(AuthBackend):
         result = yield from response.json()
         return WrittenToken(**result)
 
-    @asyncio.coroutine
+    @task
     def configure(self, *, organization):
         """Configure github organization.
 
@@ -40,7 +39,7 @@ class GitHubBackend(AuthBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def write_team(self, name, policies):
         """Configure github team.
 

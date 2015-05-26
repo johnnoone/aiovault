@@ -1,5 +1,5 @@
-import asyncio
 from aiovault.objects import SealStatus
+from aiovault.util import task
 
 
 class SealEndpoint:
@@ -7,7 +7,7 @@ class SealEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def status(self):
         """Returns the seal status of the Vault.
 
@@ -21,7 +21,7 @@ class SealEndpoint:
         result = yield from response.json()
         return SealStatus(**result)
 
-    @asyncio.coroutine
+    @task
     def seal(self):
         """Seals the Vault.
 
@@ -34,7 +34,7 @@ class SealEndpoint:
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def unseal(self, secret_shares, key):
         """Enter a single master key share to progress the unsealing of the
         Vault. If the threshold number of master key shares is reached, Vault

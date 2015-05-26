@@ -1,5 +1,5 @@
-import asyncio
 from aiovault.objects import Status, Initial, HighAvailibility, Health
+from aiovault.util import task
 
 
 class SysEndpoint:
@@ -7,7 +7,7 @@ class SysEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def status(self):
         """Return the initialization status of a Vault
 
@@ -22,7 +22,7 @@ class SysEndpoint:
         result = yield from response.json()
         return Status(**result)
 
-    @asyncio.coroutine
+    @task
     def initialize(self, secret_shares, secret_threshold):
         """Initializes a new Vault.
 
@@ -45,7 +45,7 @@ class SysEndpoint:
         result = yield from response.json()
         return Initial(**result)
 
-    @asyncio.coroutine
+    @task
     def leader(self):
         """Returns the high availability status and current leader
         instance of Vault.
@@ -60,7 +60,7 @@ class SysEndpoint:
         result = yield from response.json()
         return HighAvailibility(**result)
 
-    @asyncio.coroutine
+    @task
     def health(self):
         """Returns the health status of Vault.
 

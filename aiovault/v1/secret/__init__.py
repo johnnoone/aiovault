@@ -6,6 +6,7 @@
 
 from .backends import load_backend
 from collections.abc import Mapping
+from aiovault.util import task
 
 __all__ = ['AuthEndpoint', 'SecretCollection']
 
@@ -15,6 +16,7 @@ class SecretEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @task
     def items(self):
         """Lists all the mounted secret backends.
 
@@ -31,6 +33,7 @@ class SecretEndpoint:
         result = yield from response.json()
         return SecretCollection(result, self.req_handler)
 
+    @task
     def get(self, name):
         """Get a backend by its name
 
@@ -49,6 +52,7 @@ class SecretEndpoint:
             'req_handler': self.req_handler
         })
 
+    @task
     def mount(self, name, *, type=None, description=None):
         """Mount a new secret backend.
 
@@ -67,6 +71,7 @@ class SecretEndpoint:
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
+    @task
     def unmount(self, name):
         """Unmount the secret backend.
 
@@ -80,6 +85,7 @@ class SecretEndpoint:
         response = yield from self.req_handler(method, path)
         return response.status == 204
 
+    @task
     def move(self, src, dest):
         """Move the secret backend.
 

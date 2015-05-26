@@ -1,4 +1,3 @@
-import asyncio
 from .bases import AuthBackend
 from aiovault.objects import WrittenToken
 from aiovault.util import task
@@ -34,7 +33,7 @@ class UserPassBackend(AuthBackend):
         result = yield from response.json()
         return WrittenToken(**result)
 
-    @asyncio.coroutine
+    @task
     def create(self, username, password, policies=None):
         """The above creates a new user.
 

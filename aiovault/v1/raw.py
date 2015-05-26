@@ -1,8 +1,7 @@
-import asyncio
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import suppress
+from aiovault.util import suppress, task
 
 
 class RawEndpoint:
@@ -16,7 +15,7 @@ class RawEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
-    @asyncio.coroutine
+    @task
     def read(self, key):
         """Reads the value of the key at the given path.
 
@@ -37,7 +36,7 @@ class RawEndpoint:
         except InvalidPath:
             raise KeyError('%r does not exists' % path)
 
-    @asyncio.coroutine
+    @task
     def write(self, key, value):
         """Update the value of the key at the given path.
 
@@ -54,7 +53,7 @@ class RawEndpoint:
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
-    @asyncio.coroutine
+    @task
     def delete(self, key):
         """Ensure that key is absent with given path.
 

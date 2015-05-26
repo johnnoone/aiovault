@@ -1,4 +1,3 @@
-import asyncio
 from .bases import AuthBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value, WrittenToken
@@ -25,7 +24,7 @@ class LDAPBackend(AuthBackend):
         result = yield from response.json()
         return WrittenToken(**result)
 
-    @asyncio.coroutine
+    @task
     def configure(self, url, userattr, userdn, groupdn):
         """Configure the LDAP server to connect to.
 
@@ -57,6 +56,7 @@ class LDAPBackend(AuthBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
+    @task
     def read_group(self, name):
         """Show group.
 
@@ -75,6 +75,7 @@ class LDAPBackend(AuthBackend):
         except InvalidPath:
             raise KeyError('%r does not exists' % name)
 
+    @task
     def write_group(self, name, policies):
         """Manage users allowed to authenticate.
 
@@ -95,6 +96,7 @@ class LDAPBackend(AuthBackend):
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
 
+    @task
     def delete_group(self, name):
         """Delete group.
 
