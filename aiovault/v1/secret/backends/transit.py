@@ -1,5 +1,8 @@
 import asyncio
 from .bases import SecretBackend
+from aiovault.exceptions import InvalidPath
+from aiovault.objects import Value
+from aiovault.util import base64_encode, base64_decode
 
 
 class TransitBackend(SecretBackend):
@@ -9,36 +12,42 @@ class TransitBackend(SecretBackend):
         self.req_handler = req_handler
 
     @asyncio.coroutine
-    def get_key(self, name):
+    def read_key(self, name):
         """Returns information about a named encryption key.
 
         This is a root protected endpoint.
 
         Parameters:
             name (str): The transit key
+        Returns:
+            Value
         """
         method = 'GET'
         path = '/%s/keys/%s' % (self.name, name)
 
-        response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        try:
+            response = yield from self.req_handler(method, path)
+            result = yield from response.json()
+            return Value(**result)
+        except InvalidPath:
+            raise KeyError('%r does not exists' % name)
 
     @asyncio.coroutine
-    def create_key(self, name):
+    def write_key(self, name):
         """Creates a new named encryption key.
 
         This is a root protected endpoint.
 
         Parameters:
             name (str): The transit key
+        Returns:
+            bool
         """
         method = 'POST'
         path = '/%s/keys/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def delete_key(self, name):
@@ -49,13 +58,14 @@ class TransitBackend(SecretBackend):
 
         Parameters:
             name (str): The transit key
+        Returns:
+            bool
         """
         method = 'DELETE'
         path = '/%s/keys/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @asyncio.coroutine
     def encrypt(self, key, plaintext):
@@ -63,16 +73,17 @@ class TransitBackend(SecretBackend):
 
         Parameters:
             key (str): The transit key
-            plaintext (str): The plaintext to encrypt,
-                             provided as base64 encoded
+            plaintext (str): The plaintext to encrypt
+        Returns:
+            Value
         """
         method = 'POST'
         path = '/%s/encrypt/%s' % (self.name, key)
-        data = {'plaintext': plaintext}
+        data = {'plaintext': base64_encode(plaintext)}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
-        return result
+        return Value(**result)
 
     @asyncio.coroutine
     def decrypt(self, key, ciphertext):
@@ -82,11 +93,15 @@ class TransitBackend(SecretBackend):
             key (str): The transit key
             ciphertext (str): The ciphertext to decrypt,
                               provided as returned by encrypt.
+        Returns:
+            Value
         """
         method = 'POST'
         path = '/%s/decrypt/%s' % (self.name, key)
         data = {'ciphertext': ciphertext}
 
-        response = yield from self.req_handler(method, path, data=data)
+        response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
+        result = Value(**result)
+        result['plaintext'] = base64_decode(result['plaintext'])
         return result

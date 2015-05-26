@@ -1,9 +1,20 @@
 import asyncio
 import inspect
+from base64 import b64decode, b64encode
 from datetime import timedelta
 from functools import partial, wraps
 
 __all__ = ['format_duration', 'format_policies', 'task']
+
+
+def base64_decode(data):
+    """Decode a Base64 encodedstring"""
+    return b64decode(data.encode('utf-8')).decode('utf-8')
+
+
+def base64_encode(data):
+    """Encode a string using Base64"""
+    return b64encode(data.encode('utf-8')).decode('utf-8')
 
 
 def format_duration(obj):

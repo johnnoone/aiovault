@@ -2,7 +2,7 @@ import asyncio
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath, InvalidRequest
 from aiovault.objects import Value
-from base64 import b64encode
+from aiovault.util import base64_encode
 
 
 class ConsulBackend(SecretBackend):
@@ -70,7 +70,7 @@ class ConsulBackend(SecretBackend):
         """
         method = 'POST'
         path = '/%s/roles/%s' % (self.name, name)
-        data = {'policy': b64encode(policy.encode('utf-8')).decode('utf-8')}
+        data = {'policy': base64_encode(policy)}
 
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204
