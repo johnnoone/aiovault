@@ -1,13 +1,14 @@
-from aiovault import Vault, LoginError
+from aiovault import Vault
 from conftest import async_test
 import pytest
 
 
 CONSUL_POLICY = """
 key "" {
-	policy = "write"
+    policy = "write"
 }
 """
+
 
 @async_test
 def test_basic(dev_server, consul):

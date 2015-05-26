@@ -1,4 +1,4 @@
-from aiovault import Vault, LoginError
+from aiovault import Vault
 from conftest import async_test
 import pytest
 
@@ -7,6 +7,7 @@ MYSQL_SQL = """
 CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';
 GRANT SELECT ON *.* TO '{{name}}'@'%';
 """
+
 
 @async_test
 def test_basic(dev_server, env):

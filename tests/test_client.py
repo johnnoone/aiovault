@@ -1,5 +1,4 @@
 from conftest import async_test
-import pytest
 
 
 @async_test

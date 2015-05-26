@@ -1,4 +1,4 @@
-from aiovault import Vault, LoginError
+from aiovault import Vault
 from conftest import async_test
 import pytest
 

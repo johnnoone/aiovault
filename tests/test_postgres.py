@@ -1,4 +1,4 @@
-from aiovault import Vault, LoginError
+from aiovault import Vault
 from conftest import async_test
 import pytest
 
@@ -10,6 +10,7 @@ CREATE ROLE "{{name}}" WITH
   VALID UNTIL '{{expiration}}';
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "{{name}}";
 """
+
 
 @async_test
 def test_basic(dev_server, env):
