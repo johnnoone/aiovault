@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from collections.abc import MutableMapping
 
 
 class Status:
@@ -61,7 +62,7 @@ class SealStatus:
             self.sealed, self.threshold, self.shares, self.progress)
 
 
-class Value:
+class Value(MutableMapping):
 
     def __init__(self, *, lease_duration, auth, renewable, lease_id, data):
         self.lease_duration = lease_duration
@@ -75,11 +76,23 @@ class Value:
             other == other.data
         return self.data == other
 
+    def __hasitem__(self, name):
+        return self.data[name]
+
     def __getitem__(self, name):
         return self.data[name]
 
+    def __setitem__(self, name, value):
+        self.data[name] = value
+
+    def __delitem__(self, name):
+        del self.data[name]
+
     def __iter__(self):
         return iter(self.data.keys())
+
+    def __len__(self):
+        return len(self.data.keys())
 
     def __repr__(self):
         return '<Value(data=%r)>' % self.data
