@@ -21,6 +21,6 @@ install:
 before_script:
   - export PATH=$PATH:$PWD
 script:
-  - py.test --pep8 aiovault -v --cov aiovault --cov-report term-missing
+  - py.test --pep8 aiovault -v --cov aiovault --cov-report term-missing tests
 after_success:
   - coveralls

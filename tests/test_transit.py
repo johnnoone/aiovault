@@ -4,6 +4,7 @@ import pytest
 
 PLAIN_TEXT = "the quick brown fox"
 
+
 @async_test
 def test_basic(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
