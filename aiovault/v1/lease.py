@@ -1,3 +1,4 @@
+from aiovault.objects import Value
 from aiovault.util import task
 
 
@@ -14,6 +15,8 @@ class LeaseEndpoint:
             lease_id (str): The lease id
             increment (int): A requested amount of time in seconds
                              to extend the lease. This is advisory.
+        Returns:
+            Value
         """
         method = 'PUT'
         path = '/sys/renew/%s' % lease_id
@@ -21,7 +24,7 @@ class LeaseEndpoint:
 
         response = yield from self.req_handler(method, path, data=data)
         result = yield from response.json()
-        return result
+        return Value(**result)
 
     @task
     def revoke(self, lease_id):
@@ -29,13 +32,14 @@ class LeaseEndpoint:
 
         Parameters:
             lease_id (str): The lease id
+        Returns:
+            bool
         """
         method = 'PUT'
         path = '/sys/revoke/%s' % lease_id
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204
 
     @task
     def revoke_prefix(self, path_prefix):
@@ -43,10 +47,11 @@ class LeaseEndpoint:
 
         Parameters:
             path_prefix (str): The path prefix
+        Returns:
+            bool
         """
         method = 'PUT'
         path = '/sys/revoke-prefix/%s' % path_prefix
 
         response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        return result
+        return response.status == 204

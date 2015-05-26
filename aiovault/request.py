@@ -52,7 +52,12 @@ class Request:
 
         if response.status in (200, 204):
             return response
-        data = yield from response.json()
+
+        if response.headers['Content-Type'] == 'application/json':
+            data = yield from response.json()
+        else:
+            data = yield from response.text()
+
         if response.status == 400:
             raise InvalidRequest(data)
         if response.status == 401:
