@@ -2,7 +2,7 @@ import logging
 from .bases import AuthBackend
 from aiovault.objects import WrittenToken
 from aiovault.request import Request
-from aiovault.util import task
+from aiovault.util import format_duration, task
 
 
 class CertBackend(AuthBackend):
@@ -58,7 +58,7 @@ class CertBackend(AuthBackend):
         data = {'policies': policies,
                 'display_name': display_name,
                 'certificate': certificate,
-                'lease': lease}
+                'lease': format_duration(lease)}
 
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204

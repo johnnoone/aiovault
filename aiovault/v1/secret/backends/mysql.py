@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import task
+from aiovault.util import format_duration, task
 
 
 class MySQLBackend(SecretBackend):
@@ -62,8 +62,8 @@ class MySQLBackend(SecretBackend):
         """
         method = 'POST'
         path = '/%s/config/lease' % self.name
-        data = {'lease': lease,
-                'lease_max': lease_max}
+        data = {'lease': format_duration(lease),
+                'lease_max': format_duration(lease_max)}
 
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204

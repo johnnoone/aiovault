@@ -1,5 +1,5 @@
 from aiovault.objects import Value
-from aiovault.util import task
+from aiovault.util import format_duration, task
 
 
 class LeaseEndpoint:
@@ -20,7 +20,7 @@ class LeaseEndpoint:
         """
         method = 'PUT'
         path = '/sys/renew/%s' % lease_id
-        data = {'increment': increment}
+        data = {'increment': format_duration(increment)}
 
         response = yield from self.req_handler(method, path, data=data)
         result = yield from response.json()

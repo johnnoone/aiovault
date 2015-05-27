@@ -19,6 +19,8 @@ def base64_encode(data):
 
 def format_duration(obj):
     """Converts obj to consul duration"""
+    if obj is None:
+        return None
     if isinstance(obj, str):
         return obj
     if isinstance(obj, int):

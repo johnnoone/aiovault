@@ -1,6 +1,6 @@
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import ReadToken, WrittenToken
-from aiovault.util import task
+from aiovault.util import format_duration, task
 
 
 class TokenBackend:
@@ -47,7 +47,7 @@ class TokenBackend:
                 'policies': policies,
                 'metadata': metadata,
                 'no_parent': no_parent,
-                'lease': lease,
+                'lease': format_duration(lease),
                 'display_name': display_name,
                 'num_uses': num_uses}
 
