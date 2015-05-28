@@ -7,12 +7,9 @@ def test_userpass(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
     # enable userpass
-    response = yield from client.auth.enable('userpass')
-    assert response
+    backend = yield from client.auth.enable('userpass')
 
-    auth = client.auth.load('userpass')
-
-    response = yield from auth.create('mitchellh', 'foo')
+    response = yield from backend.create('mitchellh', 'foo')
     assert response
 
     # raw login
@@ -22,6 +19,7 @@ def test_userpass(dev_server):
     assert result['auth']['metadata'] == {'username': 'mitchellh'}
 
     # nicer login
-    backend = client.auth.load('userpass')
-    result = yield from backend.login(username='mitchellh', password='foo')
-    assert result['metadata'] == {'username': 'mitchellh'}
+    token = yield from client.auth.login('userpass',
+                                         username='mitchellh',
+                                         password='foo')
+    assert token['metadata'] == {'username': 'mitchellh'}

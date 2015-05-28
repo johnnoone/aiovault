@@ -43,30 +43,46 @@ class AuthEndpoint:
 
         return load_backend(type, {
             'name': name,
+            'type': type,
             'req_handler': self.req_handler
         })
 
     @task
+    def login(self, name, *, type=None, **credentials):
+        """Login
+
+        Parameters:
+            name (str): The name of mount
+            type (str): The name of the auth backend type, such as ``github``
+            credentials (str): Login credentials
+        Returns
+            AuthBackend
+        """
+        backend = self.load(name, type=type)
+        try:
+            token = yield from backend.login(**credentials)
+            return token
+        except AttributeError:
+            return NotImplemented
+
+    @task
     def enable(self, name, *, type=None, description=None):
-        """Enable a new auth backend
+        """Enable and load a new auth backend
 
         Parameters:
             name (str): The name of mount
             type (str): The name of the auth backend type, such as ``github``
             description (str): A human-friendly description of the auth backend
+        Returns
+            AuthBackend
         """
-        name = getattr(name, 'name', name)
-        type = type or name
-        method = 'POST'
-        path = '/sys/auth/%s' % name
-        data = {'type': type,
-                'description': description}
-
-        response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        backend = self.load(name, type=type)
+        enabled = yield from backend.enable(description)
+        if enabled:
+            return backend
 
     @task
-    def delete(self, name):
+    def disable(self, name):
         """Disable the auth backend at the given mount point
 
         Parameters:
@@ -89,6 +105,7 @@ class AuthCollection(Mapping):
         path = '%s/' % name
         return load_backend(self.backends[path]['type'], {
             'name': name,
+            'type': self.backends[path]['type'],
             'req_handler': self.req_handler
         })
 

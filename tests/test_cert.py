@@ -7,15 +7,12 @@ import os.path
 # def test_cert(dev_server, env):
 #     client = Vault(dev_server.addr, token=dev_server.root_token)
 #
-#     added = yield from client.auth.enable('cert')
-#     assert added
-#
-#     store = client.auth.load('cert')
-#     assert store.__repr__() == "<CertBackend(name='cert')>"
+#     backend = yield from client.auth.enable('cert')
+#     assert backend.__repr__() == "<CertBackend(name='cert')>"
 #
 #     filename = os.path.join(env.CERT_PATH, 'server.crt')
 #     with open(filename) as file:
-#         added = yield from store.write_cert('foo', certificate=file.read())
+#         added = yield from backend.write_cert('foo', certificate=file.read())
 #         assert added
 #
 #     certs = [
@@ -34,17 +31,14 @@ import os.path
 def test_cert_ca(dev_server, env):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    added = yield from client.auth.enable('cert')
-    assert added
-
-    store = client.auth.load('cert')
-    assert store.__repr__() == "<CertBackend(name='cert')>"
+    backend = yield from client.auth.enable('cert')
+    assert backend.__repr__() == "<CertBackend(name='cert')>"
 
     filename = os.path.join(env.CERT_PATH, 'ca', 'root.cer')
     with open(filename) as file:
-        added = yield from store.write_cert('web',
-                                            certificate=file.read(),
-                                            policies='foo')
+        added = yield from backend.write_cert('web',
+                                              certificate=file.read(),
+                                              policies='foo')
         assert added
 
     certs = [

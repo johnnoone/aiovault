@@ -5,8 +5,9 @@ from aiovault.util import format_duration, task
 
 class TokenBackend:
 
-    def __init__(self, name, req_handler):
+    def __init__(self, name, type, req_handler):
         self.name = name
+        self.type = type  # this is silly
         self.req_handler = req_handler
 
     @task

@@ -6,20 +6,16 @@ from conftest import async_test
 def test_appid(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    # enable app-id
-    response = yield from client.auth.enable('app-id')
-    assert response
+    backend = yield from client.auth.enable('app-id')
+    assert backend.__repr__() == "<AppIDBackend(name='app-id')>"
 
-    store = client.auth.load('app-id')
-    assert store.__repr__() == "<AppIDBackend(name='app-id')>"
-
-    created = yield from store.write_app('foo', policies=['dummy'])
+    created = yield from backend.write_app('foo', policies=['dummy'])
     assert created
 
-    app = yield from store.read_app('foo')
+    app = yield from backend.read_app('foo')
     assert app['key'] == 'foo'
 
-    created = yield from store.write_user('bar', app_id='foo')
+    created = yield from backend.write_user('bar', app_id='foo')
     assert created
 
     # do login

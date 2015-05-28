@@ -7,10 +7,7 @@ import pytest
 def test_ldap(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    response = yield from client.auth.enable('ldap')
-    assert response
-
-    backend = client.auth.load('ldap')
+    backend = yield from client.auth.enable('ldap')
 
     configured = yield from backend.configure(url='ldap://ldap.forumsys.com',
                                               userattr='uid',
@@ -29,10 +26,7 @@ def test_ldap(dev_server):
 def test_ldap_crud(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    response = yield from client.auth.enable('ldap')
-    assert response
-
-    backend = client.auth.load('ldap')
+    backend = yield from client.auth.enable('ldap')
 
     configured = yield from backend.configure(url='ldap://ldap.forumsys.com',
                                               userattr='uid',
