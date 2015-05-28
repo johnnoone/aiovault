@@ -10,7 +10,7 @@ import os.path
 #     added = yield from client.auth.enable('cert')
 #     assert added
 #
-#     store = yield from client.auth.get('cert')
+#     store = client.auth.load('cert')
 #     assert store.__repr__() == "<CertBackend(name='cert')>"
 #
 #     filename = os.path.join(env.CERT_PATH, 'server.crt')
@@ -36,7 +36,7 @@ def test_cert_ca(dev_server, env):
     added = yield from client.auth.enable('cert')
     assert added
 
-    store = yield from client.auth.get('cert')
+    store = client.auth.load('cert')
     assert store.__repr__() == "<CertBackend(name='cert')>"
 
     filename = os.path.join(env.CERT_PATH, 'ca', 'root.cer')

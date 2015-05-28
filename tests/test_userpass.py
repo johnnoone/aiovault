@@ -10,7 +10,7 @@ def test_userpass(dev_server):
     response = yield from client.auth.enable('userpass')
     assert response
 
-    auth = yield from client.auth.get('userpass')
+    auth = client.auth.load('userpass')
 
     response = yield from auth.create('mitchellh', 'foo')
     assert response

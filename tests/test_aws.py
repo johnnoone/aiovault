@@ -33,7 +33,7 @@ def test_basic(dev_server, env):
     added = yield from client.secret.mount('aws')
     assert added
 
-    store = yield from client.secret.get('aws')
+    store = client.secret.load('aws')
     configured = yield from store.config_root(access_key=access_key,
                                               secret_key=secret_key,
                                               region=region)
@@ -67,7 +67,7 @@ def test_crud(dev_server, env):
     added = yield from client.secret.mount('aws')
     assert added
 
-    store = yield from client.secret.get('aws')
+    store = client.secret.load('aws')
     configured = yield from store.config_root(access_key=access_key,
                                               secret_key=secret_key,
                                               region=region)

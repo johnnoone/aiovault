@@ -7,7 +7,7 @@ import pytest
 def test_generic(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    store = yield from client.secret.get('secret')
+    store = client.secret.load('secret', type='generic')
     assert store.__repr__() == "<GenericBackend(name='secret')>"
 
     data = yield from store.write('foo', {'value': 'bar'})

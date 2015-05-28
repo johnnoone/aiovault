@@ -50,7 +50,7 @@ def test_github_loading(dev_server, env):
     added = yield from client.auth.enable('github')
     assert added
 
-    store = yield from client.auth.get('github')
+    store = client.auth.load('github')
     configured = yield from store.configure(organization=github_org)
     assert configured
 

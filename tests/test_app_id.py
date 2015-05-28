@@ -10,7 +10,7 @@ def test_appid(dev_server):
     response = yield from client.auth.enable('app-id')
     assert response
 
-    store = yield from client.auth.get('app-id')
+    store = client.auth.load('app-id')
     assert store.__repr__() == "<AppIDBackend(name='app-id')>"
 
     created = yield from store.write_app('foo', policies=['dummy'])

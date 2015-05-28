@@ -8,7 +8,7 @@ from .backends import load_backend
 from collections.abc import Mapping
 from aiovault.util import task
 
-__all__ = ['AuthEndpoint', 'SecretCollection']
+__all__ = ['SecretEndpoint', 'SecretCollection']
 
 
 class SecretEndpoint:
@@ -18,7 +18,7 @@ class SecretEndpoint:
 
     @task
     def items(self):
-        """Lists all the mounted secret backends.
+        """Lists all the mounted secret backends
 
         Returns:
             SecretCollection
@@ -33,33 +33,32 @@ class SecretEndpoint:
         result = yield from response.json()
         return SecretCollection(result, self.req_handler)
 
-    @task
-    def get(self, name):
+    def load(self, name, *, type=None):
         """Get a backend by its name
 
         Parameters:
             name (str): The backed name
+            type (str): The name of the backend type, such as ``aws``
+        Returns:
+            SecretBackend
         """
+        type = type or getattr(name, 'type', name)
         name = getattr(name, 'name', name)
-        method = 'GET'
-        path = '/sys/mounts'
-
-        response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        data = result['%s/' % name]
-        return load_backend(data['type'], {
+        return load_backend(type, {
             'name': name,
             'req_handler': self.req_handler
         })
 
     @task
     def mount(self, name, *, type=None, description=None):
-        """Mount a new secret backend.
+        """Mount a new secret backend
 
         Parameters:
             name (str): The name of mount
-            type  (str): The name of the backend type, such as ``aws``
-            description  (str): A human-friendly description of the mount.
+            type (str): The name of the backend type, such as ``aws``
+            description (str): A human-friendly description of the mount
+        Returns:
+            bool
         """
         name = getattr(name, 'name', name)
         type = type or name
@@ -73,10 +72,12 @@ class SecretEndpoint:
 
     @task
     def unmount(self, name):
-        """Unmount the secret backend.
+        """Unmount the secret backend
 
         Parameters:
             mount_point (str): The name of mount
+        Returns:
+            bool
         """
         name = getattr(name, 'name', name)
         method = 'DELETE'
@@ -87,11 +88,11 @@ class SecretEndpoint:
 
     @task
     def move(self, src, dest):
-        """Move the secret backend.
+        """Move the secret backend
 
         Parameters:
-            src (str): The name to be moved
-            dest (str): The new name
+            src (str): The endpoint to be moved
+            dest (str): The new endpoint
         """
         src = getattr(src, 'name', src)
         dest = getattr(dest, 'name', dest)

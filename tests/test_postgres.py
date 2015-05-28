@@ -23,7 +23,7 @@ def test_basic(dev_server, env):
     added = yield from client.secret.mount('postgresql')
     assert added
 
-    store = yield from client.secret.get('postgresql')
+    store = client.secret.load('postgresql')
     configured = yield from store.config_connection(dsn=dsn)
     assert configured
 
@@ -51,7 +51,7 @@ def test_crud(dev_server, env):
     added = yield from client.secret.mount('postgresql')
     assert added
 
-    store = yield from client.secret.get('postgresql')
+    store = client.secret.load('postgresql')
     configured = yield from store.config_connection(dsn=dsn)
     assert configured
 

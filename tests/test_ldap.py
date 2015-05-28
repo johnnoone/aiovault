@@ -10,7 +10,7 @@ def test_ldap(dev_server):
     response = yield from client.auth.enable('ldap')
     assert response
 
-    auth = yield from client.auth.get('ldap')
+    auth = client.auth.load('ldap')
 
     configured = yield from auth.configure(url='ldap://ldap.forumsys.com',
                                            userattr='uid',
@@ -32,7 +32,7 @@ def test_ldap_crud(dev_server):
     response = yield from client.auth.enable('ldap')
     assert response
 
-    auth = yield from client.auth.get('ldap')
+    auth = client.auth.load('ldap')
 
     configured = yield from auth.configure(url='ldap://ldap.forumsys.com',
                                            userattr='uid',

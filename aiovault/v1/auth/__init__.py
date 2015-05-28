@@ -26,7 +26,7 @@ class AuthEndpoint:
 
     @task
     def items(self):
-        """Lists all the enabled auth backends.
+        """Lists all the enabled auth backends
 
         Returns:
             AuthCollection
@@ -38,35 +38,25 @@ class AuthEndpoint:
         result = yield from response.json()
         return AuthCollection(result, self.req_handler)
 
-    @task
-    def get(self, name):
-        """Returns auth backend.
+    def load(self, name, *, type=None):
+        """Returns auth backend
 
         Parameters:
             name (str): The auth backend name
         Returns
-            dict
+            AuthBackend
         """
+        type = type or getattr(name, 'type', name)
         name = getattr(name, 'name', name)
-        method = 'GET'
-        path = '/sys/auth'
 
-        response = yield from self.req_handler(method, path)
-        result = yield from response.json()
-        data = result['%s/' % name]
-        return load_backend(data['type'], {
+        return load_backend(type, {
             'name': name,
             'req_handler': self.req_handler
         })
 
     @task
     def enable(self, name, *, type=None, description=None):
-        """Enable a new auth backend.
-
-        The auth backend can be accessed and configured via the mount
-        point specified in the URL. This mount point will be exposed
-        under the auth prefix. For example, enabling with the
-        ``/sys/auth/foo`` URL will make the backend available at ``/auth/foo``.
+        """Enable a new auth backend
 
         Parameters:
             name (str): The name of mount
@@ -85,7 +75,7 @@ class AuthEndpoint:
 
     @task
     def delete(self, name):
-        """Disable the auth backend at the given mount point.
+        """Disable the auth backend at the given mount point
 
         Parameters:
             name (str): The name of mount

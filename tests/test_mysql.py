@@ -20,7 +20,7 @@ def test_basic(dev_server, env):
     added = yield from client.secret.mount('mysql')
     assert added
 
-    store = yield from client.secret.get('mysql')
+    store = client.secret.load('mysql')
     configured = yield from store.config_connection(dsn=dsn)
     assert configured
 
@@ -48,7 +48,7 @@ def test_crud(dev_server, env):
     added = yield from client.secret.mount('mysql')
     assert added
 
-    store = yield from client.secret.get('mysql')
+    store = client.secret.load('mysql')
     configured = yield from store.config_connection(dsn=dsn)
     assert configured
 

@@ -11,7 +11,7 @@ def test_basic(dev_server):
     added = yield from client.secret.mount('transit')
     assert added
 
-    store = yield from client.secret.get('transit')
+    store = client.secret.load('transit')
     written = yield from store.write_key('test')
     assert written
 

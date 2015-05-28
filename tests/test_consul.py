@@ -16,7 +16,7 @@ def test_basic(dev_server, consul):
     added = yield from client.secret.mount('consul')
     assert added
 
-    store = yield from client.secret.get('consul')
+    store = client.secret.load('consul')
     configured = yield from store.config_access(address=consul.address,
                                                 token=consul.acl_master_token)
     assert configured
@@ -34,7 +34,7 @@ def test_crud(dev_server, consul):
     added = yield from client.secret.mount('consul')
     assert added
 
-    store = yield from client.secret.get('consul')
+    store = client.secret.load('consul')
     configured = yield from store.config_access(address=consul.address,
                                                 token=consul.acl_master_token)
     assert configured
