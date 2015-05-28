@@ -8,27 +8,25 @@ PLAIN_TEXT = "the quick brown fox"
 @async_test
 def test_basic(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
-    added = yield from client.secret.mount('transit')
-    assert added
+    mounted, backend = yield from client.secret.mount('transit')
+    assert mounted
 
-    store = client.secret.load('transit')
-    written = yield from store.write_key('test')
+    written = yield from backend.write_key('test')
     assert written
 
-    policy = yield from store.read_key('test')
+    policy = yield from backend.read_key('test')
     assert policy['name'] == 'test'
 
-    encrypted = yield from store.encrypt('test', PLAIN_TEXT)
+    encrypted = yield from backend.encrypt('test', PLAIN_TEXT)
     assert 'ciphertext' in encrypted
     ciphertext = encrypted['ciphertext']
 
-    decrypted = yield from store.decrypt('test', ciphertext)
+    decrypted = yield from backend.decrypt('test', ciphertext)
     assert 'plaintext' in decrypted
     assert decrypted['plaintext'] == PLAIN_TEXT
 
-    deleted = yield from store.delete_key('test')
+    deleted = yield from backend.delete_key('test')
     assert deleted
 
     with pytest.raises(KeyError):
-        data = yield from store.read_key('test')
-        assert data['name'] == 'test'
+        yield from backend.read_key('test')

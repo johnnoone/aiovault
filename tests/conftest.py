@@ -12,14 +12,18 @@ from functools import wraps
 from subprocess import Popen, PIPE
 from time import sleep
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+__tracebackhide__ = True
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 def async_test(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        # __tracebackhide__ = True
+
         coro = asyncio.coroutine(f)
         future = coro(*args, **kwargs)
         loop = asyncio.get_event_loop()

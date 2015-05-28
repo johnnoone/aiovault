@@ -15,10 +15,6 @@ class AWSBackend(SecretBackend):
     the "roles/" endpoints before any access keys can be generated.
     """
 
-    def __init__(self, name, req_handler):
-        self.name = name
-        self.req_handler = req_handler
-
     @task
     def config_root(self, *, access_key, secret_key, region=None):
         """Configures the root IAM credentials used.

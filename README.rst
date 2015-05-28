@@ -15,9 +15,9 @@ Usage
 
     from aiovault import Vault
     client = Vault('127.0.0.1:8200')
-    result = yield from client.auth.login('userpass',
-                                          username='mitchellh',
-                                          password='foo')
+    token = yield from client.auth.login('userpass',
+                                         username='mitchellh',
+                                         password='foo')
 
 
 

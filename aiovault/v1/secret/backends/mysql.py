@@ -11,9 +11,6 @@ class MySQLBackend(SecretBackend):
     After mounting this backend, configure it using the endpoints
     within the "config/" path.
     """
-    def __init__(self, name, req_handler):
-        self.name = name
-        self.req_handler = req_handler
 
     @task
     def config_connection(self, *, dsn):

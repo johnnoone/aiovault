@@ -65,3 +65,8 @@ class DownError(HTTPError):
 class LoginError(InvalidRequest):
     """Raised when login failed
     """
+
+
+class MountError(Exception):
+    """Raised when mount failed
+    """

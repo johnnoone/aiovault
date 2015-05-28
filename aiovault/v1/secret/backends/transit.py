@@ -6,10 +6,6 @@ from aiovault.util import base64_encode, base64_decode, task
 
 class TransitBackend(SecretBackend):
 
-    def __init__(self, name, req_handler):
-        self.name = name
-        self.req_handler = req_handler
-
     @task
     def read_key(self, name):
         """Returns information about a named encryption key.

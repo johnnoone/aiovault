@@ -13,8 +13,8 @@ key "" {
 @async_test
 def test_basic(dev_server, consul):
     client = Vault(dev_server.addr, token=dev_server.root_token)
-    added = yield from client.secret.mount('consul')
-    assert added
+    mounted, backend = yield from client.secret.mount('consul')
+    assert mounted
 
     store = client.secret.load('consul')
     configured = yield from store.config_access(address=consul.address,
@@ -31,8 +31,8 @@ def test_basic(dev_server, consul):
 @async_test
 def test_crud(dev_server, consul):
     client = Vault(dev_server.addr, token=dev_server.root_token)
-    added = yield from client.secret.mount('consul')
-    assert added
+    mounted, backend = yield from client.secret.mount('consul')
+    assert mounted
 
     store = client.secret.load('consul')
     configured = yield from store.config_access(address=consul.address,

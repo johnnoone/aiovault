@@ -1,67 +1,74 @@
 from abc import ABCMeta
-from aiovault.exceptions import InvalidPath
-from aiovault.objects import Value
+from aiovault.exceptions import HTTPError, MountError
 from aiovault.util import task
 
 
 class SecretBackend(metaclass=ABCMeta):
 
-    def __init__(self, name, req_handler):
+    def __init__(self, name, type, req_handler):
         self.name = name
+        self.type = type
         self.req_handler = req_handler
 
     @task
-    def read(self, key):
-        """Reads the value of the key at the given path.
+    def mount(self, *, name=None, description=None):
+        """Mount a new secret backend
 
         Parameters:
-            key (str): The key to read
-        Returns:
-            Value: The key value
+            name (str): The new endpoint
+            description (str): A human-friendly description of the mount
         """
-        method = 'GET'
-        path = '/%s/%s' % (self.name, key)
+        name = name or self.name
+        method = 'POST'
+        path = '/sys/mounts/%s' % name
+        data = {'type': self.type,
+                'description': description}
+
+        try:
+            response = yield from self.req_handler(method, path, json=data)
+            if response.status == 204:
+                self.name = name
+                return True
+        except HTTPError as error:
+            raise MountError(*error.errors)
+        raise MountError
+
+    @task
+    def unmount(self):
+        """Unmount the secret backend
+        """
+        method = 'DELETE'
+        path = '/sys/mounts/%s' % self.name
 
         try:
             response = yield from self.req_handler(method, path)
-            result = yield from response.json()
-            return Value(**result)
-        except InvalidPath:
-            raise KeyError('%r does not exists' % key)
+            if response.status == 204:
+                return
+        except HTTPError as error:
+            raise MountError(*error.errors)
+        raise MountError
 
     @task
-    def write(self, key, values):
-        """Update the value of the key at the given path.
+    def remount(self, dest):
+        """Move the secret backend
 
         Parameters:
-            key (str): The key to read
-            values (dict): The data to write
-        Returns:
-            bool: The key has been written
+            dest (str): The new endpoint
         """
-        if not isinstance(values, dict):
-            raise ValueError('values must be a dict')
+        dest = getattr(dest, 'name', dest)
         method = 'POST'
-        path = '/%s/%s' % (self.name, key)
-        data = values
+        path = '/sys/remount'
+        data = {'from': self.name,
+                'to': dest}
 
-        response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
-
-    @task
-    def delete(self, key):
-        """Ensure that key is absent with given path.
-
-        Parameters:
-            path (str): The key name
-        Returns:
-            bool: The key does not exists in storage
-        """
-        method = 'DELETE'
-        path = '/%s/%s' % (self.name, key)
-
-        response = yield from self.req_handler(method, path)
-        return response.status == 204
+        try:
+            response = yield from self.req_handler(method, path, json=data)
+            if response.status == 204:
+                self.name = dest
+                return
+        except HTTPError as error:
+            raise MountError(*error.errors)
+        raise MountError
 
     def __repr__(self):
         return '<%s(name=%r)>' % (self.__class__.__name__, self.name)

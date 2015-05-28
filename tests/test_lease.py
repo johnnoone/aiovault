@@ -13,6 +13,7 @@ def test_renew(dev_server):
     response = yield from client.read('/secret/foo')
     result = yield from response.json()
     renewed = yield from client.lease.renew(result['lease_id'])
+    assert renewed
 
 
 @async_test

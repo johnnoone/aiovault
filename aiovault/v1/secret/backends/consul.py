@@ -6,10 +6,6 @@ from aiovault.util import base64_encode, task
 
 class ConsulBackend(SecretBackend):
 
-    def __init__(self, name, req_handler):
-        self.name = name
-        self.req_handler = req_handler
-
     @task
     def config_access(self, address, token):
         """Configures the access information for Consul.

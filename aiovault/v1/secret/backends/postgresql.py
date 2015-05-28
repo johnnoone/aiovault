@@ -6,10 +6,6 @@ from aiovault.util import format_duration, task
 
 class PostgreSQLBackend(SecretBackend):
 
-    def __init__(self, name, req_handler):
-        self.name = name
-        self.req_handler = req_handler
-
     @task
     def config_connection(self, *, dsn):
         """Configures the connection string used

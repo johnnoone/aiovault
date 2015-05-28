@@ -61,7 +61,7 @@ def test_github_loading(dev_server, env):
     dummy_token = '1111111111111111111111111111111111111111'
     with pytest.raises(LoginError):
         yield from backend.login(github_token=dummy_token)
-    token = yield from backend.login(github_token=github_token)
+    yield from backend.login(github_token=github_token)
 
     disabled = yield from backend1.disable()
     assert disabled

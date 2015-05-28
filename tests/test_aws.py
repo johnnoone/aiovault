@@ -30,23 +30,20 @@ def test_basic(dev_server, env):
                or AWS_DEFAULT_REGION missing'
 
     client = Vault(dev_server.addr, token=dev_server.root_token)
-    added = yield from client.secret.mount('aws')
-    assert added
-
-    store = client.secret.load('aws')
-    configured = yield from store.config_root(access_key=access_key,
-                                              secret_key=secret_key,
-                                              region=region)
+    mounted, backend = yield from client.secret.mount('aws')
+    configured = yield from backend.config_root(access_key=access_key,
+                                                secret_key=secret_key,
+                                                region=region)
     assert configured
 
-    configured = yield from store.config_lease(lease='1m',
-                                               lease_max='1m')
+    configured = yield from backend.config_lease(lease='1m',
+                                                 lease_max='1m')
     assert configured
 
-    configured = yield from store.write_role('foo', policy=AWS_POLICY)
+    configured = yield from backend.write_role('foo', policy=AWS_POLICY)
     assert configured
 
-    data = yield from store.creds('foo')
+    data = yield from backend.creds('foo')
     assert 'access_key' in data
     assert 'secret_key' in data
 
@@ -64,27 +61,23 @@ def test_crud(dev_server, env):
                or AWS_DEFAULT_REGION missing'
 
     client = Vault(dev_server.addr, token=dev_server.root_token)
-    added = yield from client.secret.mount('aws')
-    assert added
-
-    store = client.secret.load('aws')
-    configured = yield from store.config_root(access_key=access_key,
-                                              secret_key=secret_key,
-                                              region=region)
+    mounted, backend = yield from client.secret.mount('aws')
+    configured = yield from backend.config_root(access_key=access_key,
+                                                secret_key=secret_key,
+                                                region=region)
     assert configured
 
-    configured = yield from store.config_lease(lease='1m',
-                                               lease_max='1m')
+    configured = yield from backend.config_lease(lease='1m', lease_max='1m')
     assert configured
 
-    configured = yield from store.write_role('test', policy=AWS_POLICY)
+    configured = yield from backend.write_role('test', policy=AWS_POLICY)
     assert configured
 
-    role = yield from store.read_role('test')
+    role = yield from backend.read_role('test')
     assert 'policy' in role
 
-    deleted = yield from store.delete_role('test')
+    deleted = yield from backend.delete_role('test')
     assert deleted
 
     with pytest.raises(KeyError):
-        yield from store.read_role('test')
+        yield from backend.read_role('test')
