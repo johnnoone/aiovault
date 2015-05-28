@@ -1,6 +1,6 @@
 import logging
 from .bases import AuthBackend
-from aiovault.objects import WrittenToken
+from aiovault.token import authenticate
 from aiovault.request import Request
 from aiovault.util import format_duration, task
 
@@ -21,7 +21,7 @@ class CertBackend(AuthBackend):
     def login(self, *, cert):
         """
         Returns:
-            WrittenToken
+            LoginToken
         """
         method = 'POST'
         path = '/auth/%s/certs/login' % self.name
@@ -35,9 +35,11 @@ class CertBackend(AuthBackend):
                                   self.req_handler.version,
                                   self.req_handler.token,
                                   cert)
-        response = yield from req_handler(method, path)
-        result = yield from response.json()
-        return WrittenToken(**result)
+
+        token = yield from authenticate(req_handler,
+                                        method,
+                                        path)
+        return token
 
     @task
     def write_cert(self, name, *, certificate, display_name=None,

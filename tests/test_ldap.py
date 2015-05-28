@@ -10,18 +10,18 @@ def test_ldap(dev_server):
     response = yield from client.auth.enable('ldap')
     assert response
 
-    auth = client.auth.load('ldap')
+    backend = client.auth.load('ldap')
 
-    configured = yield from auth.configure(url='ldap://ldap.forumsys.com',
-                                           userattr='uid',
-                                           userdn='dc=example,dc=com',
-                                           groupdn='dc=example,dc=com')
+    configured = yield from backend.configure(url='ldap://ldap.forumsys.com',
+                                              userattr='uid',
+                                              userdn='dc=example,dc=com',
+                                              groupdn='dc=example,dc=com')
     assert configured
 
-    writen = yield from auth.write_group(name='scientists', policies='foo')
+    writen = yield from backend.write_group(name='scientists', policies='foo')
     assert writen
 
-    token = yield from auth.login(username='tesla', password='password')
+    token = yield from backend.login(username='tesla', password='password')
     assert token['metadata']['username'] == 'tesla'
 
 
@@ -32,22 +32,22 @@ def test_ldap_crud(dev_server):
     response = yield from client.auth.enable('ldap')
     assert response
 
-    auth = client.auth.load('ldap')
+    backend = client.auth.load('ldap')
 
-    configured = yield from auth.configure(url='ldap://ldap.forumsys.com',
-                                           userattr='uid',
-                                           userdn='dc=example,dc=com',
-                                           groupdn='dc=example,dc=com')
+    configured = yield from backend.configure(url='ldap://ldap.forumsys.com',
+                                              userattr='uid',
+                                              userdn='dc=example,dc=com',
+                                              groupdn='dc=example,dc=com')
     assert configured
 
-    writen = yield from auth.write_group(name='g1', policies='foo')
+    writen = yield from backend.write_group(name='g1', policies='foo')
     assert writen
 
-    data = yield from auth.read_group(name='g1')
+    data = yield from backend.read_group(name='g1')
     assert data['policies'] == 'foo'
 
-    deleted = yield from auth.delete_group(name='g1')
+    deleted = yield from backend.delete_group(name='g1')
     assert deleted
 
     with pytest.raises(KeyError):
-        yield from auth.read_group(name='g1')
+        yield from backend.read_group(name='g1')

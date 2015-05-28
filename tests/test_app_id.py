@@ -26,9 +26,8 @@ def test_appid(dev_server):
     client = Vault(dev_server.addr)
 
     # login
-    result = yield from client.auth.login('app-id',
-                                          app_id='foo',
-                                          user_id='bar')
+    backend = client.auth.load('app-id')
+    result = yield from backend.login(app_id='foo', user_id='bar')
     assert result['policies'] == ['dummy']
 
 

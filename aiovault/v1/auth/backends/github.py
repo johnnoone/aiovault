@@ -1,5 +1,5 @@
 from .bases import AuthBackend
-from aiovault.objects import WrittenToken
+from aiovault.token import authenticate
 from aiovault.util import format_policies, task
 
 
@@ -12,15 +12,17 @@ class GitHubBackend(AuthBackend):
         Parameters:
             github_token (str): GitHub personal API token
         Returns:
-            WrittenToken
+            LoginToken
         """
         method = 'POST'
         path = '/auth/%s/login' % self.name
         data = {'token': github_token}
 
-        response = yield from self.req_handler(method, path, json=data)
-        result = yield from response.json()
-        return WrittenToken(**result)
+        token = yield from authenticate(self.req_handler,
+                                        method,
+                                        path,
+                                        json=data)
+        return token
 
     @task
     def configure(self, *, organization):

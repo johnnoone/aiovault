@@ -57,11 +57,10 @@ def test_github_loading(dev_server, env):
     configured = yield from store.write_team('test', policies='foo')
     assert configured
 
-    client2 = Vault(dev_server.addr)
+    client = Vault(dev_server.addr)
+    backend = client.auth.load('github')
     dummy_token = '1111111111111111111111111111111111111111'
     with pytest.raises(LoginError):
-        yield from client2.auth.login('github',
-                                      github_token=dummy_token)
-    token = yield from client2.auth.login('github',
-                                          github_token=github_token)
+        yield from backend.login(github_token=dummy_token)
+    token = yield from backend.login(github_token=github_token)
     print(token)

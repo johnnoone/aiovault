@@ -1,6 +1,7 @@
 from .bases import AuthBackend
 from aiovault.exceptions import InvalidPath
-from aiovault.objects import Value, WrittenToken
+from aiovault.objects import Value
+from aiovault.token import authenticate
 from aiovault.util import format_policies, task
 
 
@@ -14,15 +15,17 @@ class LDAPBackend(AuthBackend):
             username (str): DN (distinguished name) to be used for login
             password (str): Password for this user
         Returns:
-            WrittenToken
+            LoginToken
         """
         method = 'POST'
         path = '/auth/%s/login/%s' % (self.name, username)
         data = {'password': password}
 
-        response = yield from self.req_handler(method, path, json=data)
-        result = yield from response.json()
-        return WrittenToken(**result)
+        token = yield from authenticate(self.req_handler,
+                                        method,
+                                        path,
+                                        json=data)
+        return token
 
     @task
     def configure(self, url, userattr, userdn, groupdn):

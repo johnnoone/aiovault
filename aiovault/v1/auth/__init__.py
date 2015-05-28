@@ -4,25 +4,17 @@
 
 """
 
-from .backends import load_backend, load_login
+from .backends import load_backend
 from collections.abc import Mapping
 from aiovault.util import task
 
-__all__ = ['AuthEndpoint', 'AuthCollection']
+__all__ = ['authenticate', 'AuthEndpoint', 'AuthCollection']
 
 
 class AuthEndpoint:
 
     def __init__(self, req_handler):
         self.req_handler = req_handler
-
-    @task
-    def login(self, endpoint, **credentials):
-        res = load_login(endpoint, {
-            'name': endpoint,
-            'req_handler': self.req_handler
-        }, credentials)
-        return res
 
     @task
     def items(self):

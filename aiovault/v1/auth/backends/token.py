@@ -1,5 +1,5 @@
 from aiovault.exceptions import InvalidPath
-from aiovault.objects import ReadToken, WrittenToken
+from aiovault.token import ReadToken, LoginToken
 from aiovault.util import format_duration, task
 
 
@@ -39,7 +39,7 @@ class TokenBackend:
                             token. Defaults to 0, which has no limit to number
                             of uses.
         Returns:
-            WrittenToken: The client token
+            LoginToken: The client token
         """
         method = 'POST'
         path = '/auth/%s/create' % self.name
@@ -53,7 +53,7 @@ class TokenBackend:
 
         response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
-        return WrittenToken(**result)
+        return LoginToken(**result)
 
     @task
     def lookup_self(self):
@@ -154,7 +154,7 @@ class TokenBackend:
             increment (int): An optional requested lease increment can be
                              provided. This increment may be ignored.
         Returns:
-            WrittenToken: The client token
+            LoginToken: The client token
         """
         token = getattr(token, 'id', token)
         method = 'POST'
@@ -163,4 +163,4 @@ class TokenBackend:
 
         response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
-        return WrittenToken(**result)
+        return LoginToken(**result)

@@ -1,5 +1,6 @@
 from .bases import AuthBackend
-from aiovault.objects import Value, WrittenToken
+from aiovault.objects import Value
+from aiovault.token import authenticate
 from aiovault.util import format_policies, task
 
 
@@ -13,16 +14,18 @@ class AppIDBackend(AuthBackend):
             app_id (str): The app id
             user_id (str): The user id
         Returns:
-            WrittenToken: The client token
+            LoginToken: The client token
         """
         method = 'POST'
         path = '/auth/%s/login' % self.name
         data = {'app_id': app_id,
                 'user_id': user_id}
 
-        response = yield from self.req_handler(method, path, json=data)
-        result = yield from response.json()
-        return WrittenToken(**result)
+        token = yield from authenticate(self.req_handler,
+                                        method,
+                                        path,
+                                        json=data)
+        return token
 
     @task
     def read_app(self, app_id):

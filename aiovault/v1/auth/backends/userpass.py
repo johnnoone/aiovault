@@ -1,5 +1,5 @@
 from .bases import AuthBackend
-from aiovault.objects import WrittenToken
+from aiovault.token import authenticate
 from aiovault.util import task
 
 
@@ -23,15 +23,17 @@ class UserPassBackend(AuthBackend):
             username (str): The username
             password (str): The password
         Returns:
-            WrittenToken
+            LoginToken
         """
         method = 'POST'
         path = '/auth/%s/login/%s' % (self.name, username)
         data = {'password': password}
 
-        response = yield from self.req_handler(method, path, json=data)
-        result = yield from response.json()
-        return WrittenToken(**result)
+        token = yield from authenticate(self.req_handler,
+                                        method,
+                                        path,
+                                        json=data)
+        return token
 
     @task
     def create(self, username, password, policies=None):

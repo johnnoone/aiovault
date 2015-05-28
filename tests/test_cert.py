@@ -22,8 +22,9 @@ import os.path
 #         os.path.join(env.CERT_PATH, 'server.key'),
 #         os.path.join(env.CERT_PATH, 'server.crt'),
 #     ]
-#     client2 = Vault('https://127.0.0.1:8200')
-#     res =  yield from client2.auth.login('cert', cert=certs)
+#     client = Vault('https://127.0.0.1:8200')
+#     backend = client.auth.load('cert')
+#     res =  yield from backend.login('cert', cert=certs)
 #     print(res)
 #     assert False
 
@@ -50,7 +51,8 @@ def test_cert_ca(dev_server, env):
         os.path.join(env.CERT_PATH, 'key', 'ourdomain.cer'),
         os.path.join(env.CERT_PATH, 'key', 'ourdomain.key'),
     ]
-    client2 = Vault('http://127.0.0.1:8200')
-    res = yield from client2.auth.login('cert', cert=certs)
+    client = Vault('http://127.0.0.1:8200')
+    backend = client.auth.load('cert')
+    res = yield from backend.login('cert', cert=certs)
     print(res)
     assert False
