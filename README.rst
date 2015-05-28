@@ -11,14 +11,28 @@ Install
 Usage
 -----
 
-::
+On the admin side::
+
+    from aiovault import Vault
+    client = Vault('127.0.0.1:8200', token=MY_MASTER_TOKEN)
+
+    # mount consul, and policies
+    mounted, backend = yield from client.secret.mount('consul')
+    yield from backend.config_access('http://127.0.0.1:8500',
+                                     token=ACL_MASTER_TOKEN)
+    yield from store.write_role('foo', policy=CONSUL_POLICY)
+
+On the client side::
 
     from aiovault import Vault
     client = Vault('127.0.0.1:8200')
-    token = yield from client.auth.login('userpass',
-                                         username='mitchellh',
-                                         password='foo')
 
+    # login 
+    yield from client.auth.login('userpass',
+                                 username='mitchellh',
+                                 password='foo')
+    # generate consul new credential
+    credentials = yield from client.secret.load('consul').creds('foo')
 
 
 Testing
@@ -32,7 +46,6 @@ Testing
 
 Setup MySQL with macport
 ------------------------
-
 
 Install MySQL::
 

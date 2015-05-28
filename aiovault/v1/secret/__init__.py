@@ -32,6 +32,25 @@ class SecretEndpoint:
         result = yield from response.json()
         return SecretCollection(result, self.req_handler)
 
+    def __getattr__(self, type):
+        """Shortcut for type loading"""
+        type = type.replace('_', '-')
+        if type == 'generic':
+            name = 'secret'
+        else:
+            name = type
+        backend = self.load(name, type=type)
+
+        prev = getattr(backend, '__call__', None)
+
+        def rename(backend, name=None):
+            backend.name = name or backend.name
+            delattr(backend, '__call__')
+            if prev:
+                setattr(backend, '__call__', prev)
+        setattr(backend, '__call__', rename)
+        return backend
+
     def load(self, name, *, type=None):
         """Get a backend by its name
 

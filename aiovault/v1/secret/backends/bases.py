@@ -28,7 +28,7 @@ class SecretBackend(metaclass=ABCMeta):
             response = yield from self.req_handler(method, path, json=data)
             if response.status == 204:
                 self.name = name
-                return True
+                return
         except HTTPError as error:
             raise MountError(*error.errors)
         raise MountError
