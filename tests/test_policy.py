@@ -1,4 +1,4 @@
-from aiovault import Vault
+from aiovault import Vault, Policy
 from conftest import async_test
 import pytest
 
@@ -23,10 +23,8 @@ def test_policy(dev_server):
         yield from client.policy.read('foo')
 
     rules = {
-        'path': {
-            'sys': {
-                'policy': 'deny'
-            }
+        'sys': {
+            'policy': 'deny'
         }
     }
 
@@ -35,5 +33,17 @@ def test_policy(dev_server):
 
     policy = yield from client.policy.read('foo')
     assert policy.name == 'foo'
+    assert 'sys' in policy
     assert policy.rules == rules
     assert policy == rules
+
+    # add other rules
+    policy['bar/baz'] = 'deny'
+
+    written = yield from client.policy.write('foo', policy)
+    assert written is True
+
+    policy = yield from client.policy.read('foo')
+    assert policy.name == 'foo'
+    assert 'sys' in policy
+    assert 'bar/baz' in policy

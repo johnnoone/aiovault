@@ -1,6 +1,6 @@
 import json
 from aiovault.exceptions import InvalidPath
-from aiovault.objects import Policy
+from aiovault.policy import Policy
 from aiovault.util import suppress, task
 
 
@@ -35,9 +35,11 @@ class PolicyEndpoint:
         try:
             response = yield from self.req_handler(method, path)
             result = yield from response.json()
+            name, rules = '', ''
             with suppress(KeyError, ValueError):
-                result['rules'] = json.loads(result['rules'])
-            return Policy(**result)
+                name = result['name']
+                rules = json.loads(result['rules']).get('path', None)
+            return Policy(name=name, rules=rules)
         except InvalidPath:
             raise KeyError('%r does not exists' % name)
 
@@ -56,7 +58,8 @@ class PolicyEndpoint:
         """
         method = 'PUT'
         path = '/sys/policy/%s' % name
-        data = {'rules': json.dumps(rules)}
+        rules = getattr(rules, 'rules', rules)
+        data = {'rules': json.dumps({'path': rules})}
 
         response = yield from self.req_handler(method, path, json=data)
         return response.status == 204

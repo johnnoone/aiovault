@@ -92,18 +92,3 @@ class Value(MutableMapping):
 
     def __repr__(self):
         return '<Value(data=%r)>' % self.data
-
-
-class Policy:
-
-    def __init__(self, *, name, rules):
-        self.name = name
-        self.rules = rules or {}
-
-    def __eq__(self, other):
-        if isinstance(other, Policy):
-            other == other.rules
-        return self.rules == other
-
-    def __repr__(self):
-        return '<Policy(name=%r)>' % self.name
