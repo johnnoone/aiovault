@@ -1,0 +1,12 @@
+{
+  "backend": {
+    "inmem": {}
+  },
+  "listener": {
+    "tcp": {
+      "address": "127.0.0.1:8200",
+      "tls_key_file": "server.key",
+      "tls_cert_file": "server.crt"
+    }
+  }
+}

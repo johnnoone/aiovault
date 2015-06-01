@@ -11,24 +11,28 @@ class PolicyEndpoint:
 
     @task
     def items(self):
-        """Lists all the available policies.
+        """List the policies on the server.
+
+        Returns:
+            set: Policy names
         """
         method = 'GET'
         path = '/sys/policy'
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result['policies']
+        return set(result['policies'])
 
     @task
     def read(self, name):
-        """Fetch one policy by its name.
+        """Read a single policy.
 
         Parameters:
             name (str): The policy name
         Returns:
             Policy: The policy
         """
+        name = getattr(name, 'name', name)
         method = 'GET'
         path = '/sys/policy/%s' % name
 
@@ -45,7 +49,7 @@ class PolicyEndpoint:
 
     @task
     def write(self, name, rules):
-        """Add or update a policy.
+        """Write a policy with the given name and rules.
 
         Once a policy is updated, it takes effect immediately to all
         associated users.
@@ -56,9 +60,10 @@ class PolicyEndpoint:
         Returns:
             bool: Policy has been written
         """
+        name = getattr(name, 'name', name)
+        rules = getattr(rules, 'rules', rules)
         method = 'PUT'
         path = '/sys/policy/%s' % name
-        rules = getattr(rules, 'rules', rules)
         data = {'rules': json.dumps({'path': rules})}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -68,13 +73,16 @@ class PolicyEndpoint:
     def delete(self, name):
         """Delete the policy with the given name.
 
-        This will immediately affect all associated users.
+        This will immediately affect all associated users. When a user
+        is associated with a policy that doesn't exist, it is identical
+        to not being associated with that policy.
 
         Parameters:
             name (str): The policy name
         Returns:
             bool: Policy does not exists in storage
         """
+        name = getattr(name, 'name', name)
         method = 'DELETE'
         path = '/sys/policy/%s' % name
 

@@ -35,10 +35,14 @@ def async_test(f):
 
 
 def extract(src, pattern):
-    return re.search(pattern, src).group(1)
+    try:
+        return re.search(pattern, src).group(1)
+    except AttributeError:
+        pass
 
 
 class Vault:
+
     def __init__(self, name):
         self.name = name
         self._proc = None
@@ -50,22 +54,25 @@ class Vault:
 
     def start(self):
         if self._proc:
-            raise Exception('Node %s is already running' % self.name)
+            raise Exception('Vault %s is already running' % self.name)
 
         env = os.environ.copy()
         env.setdefault('GOMAXPROCS', '2')
 
         clean = Popen(['killall', 'vault'],
-                      stdout=PIPE, stderr=PIPE, env=env, shell=False)
+                      stdout=PIPE,
+                      stderr=PIPE,
+                      env=env,
+                      shell=False)
         clean.communicate()
 
-        proc = Popen(['vault', 'server', '-dev'],
-                     stdout=PIPE, stderr=PIPE, env=env, shell=False)
+        args = ['vault', 'server', '-dev']
+
+        proc = Popen(args, stdout=PIPE, stderr=PIPE, env=env, shell=False)
         self._proc = proc
 
         print('Starting %s [%s]' % (self.name, proc.pid))
 
-        data = {}
         buf = ''
         while 'Vault server started!' not in buf:
             buf += proc.stdout.read(1).decode('utf-8')
@@ -75,6 +82,7 @@ class Vault:
             'unseal_key': extract(buf, 'Unseal Key: ([\w-]+)\W'),
             'root_token': extract(buf, 'Root Token: ([\w-]+)'),
         }
+
         env.setdefault('VAULT_ADDR', data['addr'])
         proc_kwargs = {'stdout': PIPE,
                        'stderr': PIPE,
@@ -109,6 +117,81 @@ class Vault:
         result = self._proc.terminate()
         self._proc = None
         return result
+
+    def __repr__(self):
+        return '<Vault(name=%r)>' % self.name
+
+
+class VaultTLS:
+    def __init__(self, name, *, server_config):
+        self.name = name
+        self._proc = None
+        self._data = None
+        self.server_config = server_config
+
+    @property
+    def config(self):
+        return self._data
+
+    def start(self):
+        if self._proc:
+            raise Exception('Vault %s is already running' % self.name)
+
+        env = os.environ.copy()
+        env.setdefault('GOMAXPROCS', '2')
+        env['SSL_CERT_DIR'] = os.path.join(HERE, 'certs')
+
+        clean = Popen(['killall', 'vault'],
+                      stdout=PIPE, stderr=PIPE, env=env, shell=False)
+        clean.communicate()
+        cwd = os.path.dirname(self.server_config)
+        args = ['vault', 'server', '-config', self.server_config]
+
+        proc = Popen(args,
+                     stdout=PIPE,
+                     stderr=PIPE,
+                     env=env,
+                     shell=False,
+                     cwd=cwd)
+        self._proc = proc
+
+        print('Starting %s [%s]' % (self.name, proc.pid))
+
+        buf = ''
+        while 'Vault server started!' not in buf:
+            buf += proc.stdout.read(1).decode('utf-8')
+
+        with open(self.server_config) as file:
+            configuration = json.load(file)['listener']['tcp']
+            if configuration.get('tls_disable', False):
+                addr = 'http://%s' % configuration['address']
+            else:
+                addr = 'https://%s' % configuration['address']
+            base = os.path.dirname(self.server_config)
+            data = {
+                'addr': addr,
+                'key': os.path.join(base, 'server.key'),
+                'crt': os.path.join(base, 'server.crt'),
+                'csr': os.path.join(base, 'server.csr'),
+                'full': os.path.join(base, 'server.full'),
+            }
+
+        env.setdefault('VAULT_ADDR', data['addr'])
+        self._data = Namespace()
+        self._data.update(data)
+        print('Node %s [%s] is ready to rock' % (self.name, proc.pid), data)
+
+    def stop(self):
+        if not self._proc:
+            raise Exception('Node %s is not running' % self.name)
+        print('Halt %s [%s]' % (self.name, self._proc.pid))
+        result = self._proc.terminate()
+        self._proc = None
+        return result
+
+    def __repr__(self):
+        return '<Vault(name=%r, server_config=%r)>' % (self.name,
+                                                       self.server_config)
 
 
 class Consul(object):
@@ -176,7 +259,16 @@ def consul(request):
 
 @pytest.fixture(scope='function', autouse=False)
 def dev_server(request):
-    server = Vault('leader')
+    server = Vault('dev')
+    server.start()
+    request.addfinalizer(server.stop)
+    return server.config
+
+
+@pytest.fixture(scope='function', autouse=False)
+def server(request):
+    conf = os.path.join(HERE, 'certs/server.json')
+    server = VaultTLS('https', server_config=conf)
     server.start()
     request.addfinalizer(server.stop)
     return server.config

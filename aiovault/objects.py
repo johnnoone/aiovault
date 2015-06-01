@@ -69,6 +69,9 @@ class Value(MutableMapping):
         self.renewable = renewable
         self.lease_id = lease_id
         self.data = data
+        if 'policies' in data:
+            value = data['policies']
+            self.data['policies'] = set(value.split(',') if value else [])
 
     def __eq__(self, other):
         if isinstance(other, Value):

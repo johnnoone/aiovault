@@ -38,7 +38,7 @@ def test_ldap_crud(dev_server):
     assert writen
 
     data = yield from backend.read_group(name='g1')
-    assert data['policies'] == 'foo'
+    assert data['policies'] == {'foo'}
 
     deleted = yield from backend.delete_group(name='g1')
     assert deleted

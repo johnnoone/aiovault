@@ -1,8 +1,9 @@
 import logging
 from .bases import AuthBackend
-from aiovault.token import authenticate
+from aiovault.objects import Value
 from aiovault.request import Request
-from aiovault.util import format_duration, task
+from aiovault.token import authenticate
+from aiovault.util import format_duration, format_policies, task
 
 
 class CertBackend(AuthBackend):
@@ -57,7 +58,7 @@ class CertBackend(AuthBackend):
         """
         method = 'POST'
         path = '/auth/%s/certs/%s' % (self.name, name)
-        data = {'policies': policies,
+        data = {'policies': format_policies(policies),
                 'display_name': display_name,
                 'certificate': certificate,
                 'lease': format_duration(lease)}
@@ -77,7 +78,7 @@ class CertBackend(AuthBackend):
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
-        return result
+        return Value(**result)
 
     @task
     def delete_cert(self, name):

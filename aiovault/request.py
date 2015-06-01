@@ -26,10 +26,9 @@ class Request:
                 logging.warn('exchanged %r to %r', addr, n)
                 self.addr = n
 
-            certfile, keyfile = cert
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-            context.verify_mode = ssl.CERT_REQUIRED
-            context.load_cert_chain(certfile, keyfile)
+            context.verify_mode = ssl.CERT_OPTIONAL
+            context.load_cert_chain(*cert)
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
