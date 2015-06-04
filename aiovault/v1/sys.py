@@ -40,8 +40,10 @@ class SysEndpoint:
         """
         method = 'PUT'
         path = '/sys/init'
+        data = {'secret_shares': secret_shares,
+                'secret_threshold': secret_threshold}
 
-        response = yield from self.req_handler(method, path)
+        response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
         return Initial(**result)
 

@@ -1,5 +1,13 @@
-from aiovault import Vault
+from aiovault import Vault, VaultCLI
 from conftest import async_test
+
+
+@async_test
+def test_init_cli(server):
+    cli = VaultCLI(server)
+    cli.initialize()
+    cli.unseal()
+    cli.audit_file(path='/tmp/aiovault.log')
 
 
 @async_test
@@ -7,9 +15,14 @@ def test_init(server):
     client = Vault(server.addr, cert=[server.csr, server.key])
     print(client)
 
-    # list mounted backends
-    response = yield from client.initialize(secret_shares=2,
-                                            secret_threshold=2)
+    response = yield from client.status()
     print(response)
 
-    assert False
+    state = yield from client.initialize(secret_shares=5, secret_threshold=3)
+    assert hasattr(state, 'root_token')
+    assert hasattr(state, 'keys')
+
+    status = yield from client.seal.status()
+    assert status.sealed is True
+    status = yield from client.seal.unseal(state.keys)
+    assert status.sealed is False

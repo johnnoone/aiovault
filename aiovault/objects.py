@@ -11,10 +11,21 @@ class Status:
 
 
 class Initial:
+    """
+    Implements master initiales.
+
+    Attributes:
+        root_token (str): The root token
+        keys (tuple): The secret keys
+    """
 
     def __init__(self, *, root_token, keys):
         self.root_token = root_token
-        self.keys = keys
+        self.keys = tuple(keys)
+
+    def __iter__(self):
+        for key in self.keys:
+            yield key
 
     def __repr__(self):
         return '<Initial(root_token=%r, keys=%r)>' % (

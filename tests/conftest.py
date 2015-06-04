@@ -71,11 +71,13 @@ class Vault:
         proc = Popen(args, stdout=PIPE, stderr=PIPE, env=env, shell=False)
         self._proc = proc
 
-        print('Starting %s [%s]' % (self.name, proc.pid))
+        logging.info('Starting %s [%s]' % (self.name, proc.pid))
 
         buf = ''
         while 'Vault server started!' not in buf:
             buf += proc.stdout.read(1).decode('utf-8')
+
+        logging.debug(buf)
 
         data = {
             'addr': extract(buf, 'VAULT_ADDR=\'(.+)\''),
@@ -108,12 +110,15 @@ class Vault:
 
         self._data = Namespace()
         self._data.update(data)
-        print('Node %s [%s] is ready to rock' % (self.name, proc.pid), data)
+        logging.info('Vault %s [%s] is ready to rock %s',
+                     self.name,
+                     proc.pid,
+                     data)
 
     def stop(self):
         if not self._proc:
             raise Exception('Node %s is not running' % self.name)
-        print('Halt %s [%s]' % (self.name, self._proc.pid))
+        logging.info('Halt %s [%s]' % (self.name, self._proc.pid))
         result = self._proc.terminate()
         self._proc = None
         return result
@@ -139,7 +144,7 @@ class VaultTLS:
 
         env = os.environ.copy()
         env.setdefault('GOMAXPROCS', '2')
-        env['SSL_CERT_DIR'] = os.path.join(HERE, 'certs')
+        # env['SSL_CERT_DIR'] = os.path.join(HERE, 'certs')
 
         clean = Popen(['killall', 'vault'],
                       stdout=PIPE, stderr=PIPE, env=env, shell=False)
@@ -155,11 +160,13 @@ class VaultTLS:
                      cwd=cwd)
         self._proc = proc
 
-        print('Starting %s [%s]' % (self.name, proc.pid))
+        logging.info('Starting %s [%s]' % (self.name, proc.pid))
 
         buf = ''
         while 'Vault server started!' not in buf:
             buf += proc.stdout.read(1).decode('utf-8')
+
+        logging.debug(buf)
 
         with open(self.server_config) as file:
             configuration = json.load(file)['listener']['tcp']
@@ -173,18 +180,20 @@ class VaultTLS:
                 'key': os.path.join(base, 'server.key'),
                 'crt': os.path.join(base, 'server.crt'),
                 'csr': os.path.join(base, 'server.csr'),
-                'full': os.path.join(base, 'server.full'),
             }
 
-        env.setdefault('VAULT_ADDR', data['addr'])
+        # env.setdefault('VAULT_ADDR', data['addr'])
         self._data = Namespace()
         self._data.update(data)
-        print('Node %s [%s] is ready to rock' % (self.name, proc.pid), data)
+        logging.info('Vault %s [%s] is ready to rock %s',
+                     self.name,
+                     proc.pid,
+                     data)
 
     def stop(self):
         if not self._proc:
             raise Exception('Node %s is not running' % self.name)
-        print('Halt %s [%s]' % (self.name, self._proc.pid))
+        logging.info('Halt %s [%s]' % (self.name, self._proc.pid))
         result = self._proc.terminate()
         self._proc = None
         return result
@@ -222,7 +231,7 @@ class Consul(object):
         proc = Popen(['consul', 'agent', '-config-file=%s' % self.config_file],
                      stdout=PIPE, stderr=PIPE, env=env, shell=False)
         self._proc = proc
-        print('Starting %s [%s]' % (self.name, proc.pid))
+        logging.info('Starting %s [%s]' % (self.name, proc.pid))
         for i in range(60):
             with Popen(['consul', 'info'], stdout=PIPE, stderr=PIPE) as sub:
                 stdout, stderr = sub.communicate(timeout=5)
@@ -237,12 +246,12 @@ class Consul(object):
             sleep(1)
         else:
             raise Exception('Unable to start %s [%s]' % (self.name, proc.pid))
-        print('Node %s [%s] is ready to rock' % (self.name, proc.pid))
+        logging.info('Node %s [%s] is ready to rock' % (self.name, proc.pid))
 
     def stop(self):
         if not self._proc:
             raise Exception('Node %s is not running' % self.name)
-        print('Halt %s [%s]' % (self.name, self._proc.pid))
+        logging.info('Halt %s [%s]' % (self.name, self._proc.pid))
         result = self._proc.terminate()
         self._proc = None
         return result

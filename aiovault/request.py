@@ -19,7 +19,8 @@ class Request:
             cookies.setdefault('token', self.token)
 
         connector = None
-        if cert:
+        use_ssl = addr.startswith('https://') or cert
+        if use_ssl:
             logging.info('use ssl context')
             if addr.startswith('http://'):
                 n = 'https://%s' % addr[7:]
@@ -27,8 +28,9 @@ class Request:
                 self.addr = n
 
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-            context.verify_mode = ssl.CERT_OPTIONAL
-            context.load_cert_chain(*cert)
+            context.verify_mode = ssl.CERT_NONE
+            if cert:
+                context.load_cert_chain(*cert)
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
