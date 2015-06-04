@@ -63,12 +63,18 @@ class Vault:
                       stdout=PIPE,
                       stderr=PIPE,
                       env=env,
-                      shell=False)
+                      shell=False,
+                      timeout=5)
         clean.communicate()
 
         args = ['vault', 'server', '-dev']
 
-        proc = Popen(args, stdout=PIPE, stderr=PIPE, env=env, shell=False)
+        proc = Popen(args,
+                     stdout=PIPE,
+                     stderr=PIPE,
+                     env=env,
+                     shell=False,
+                     timeout=30)
         self._proc = proc
 
         logging.info('Starting %s [%s]' % (self.name, proc.pid))
@@ -147,7 +153,11 @@ class VaultTLS:
         # env['SSL_CERT_DIR'] = os.path.join(HERE, 'certs')
 
         clean = Popen(['killall', 'vault'],
-                      stdout=PIPE, stderr=PIPE, env=env, shell=False)
+                      stdout=PIPE,
+                      stderr=PIPE,
+                      env=env,
+                      shell=False,
+                      timeout=5)
         clean.communicate()
         cwd = os.path.dirname(self.server_config)
         args = ['vault', 'server', '-config', self.server_config]
@@ -157,7 +167,8 @@ class VaultTLS:
                      stderr=PIPE,
                      env=env,
                      shell=False,
-                     cwd=cwd)
+                     cwd=cwd,
+                     timeout=30)
         self._proc = proc
 
         logging.info('Starting %s [%s]' % (self.name, proc.pid))
