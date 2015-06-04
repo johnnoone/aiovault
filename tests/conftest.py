@@ -142,6 +142,23 @@ class VaultTLS:
         if self._proc:
             raise Exception('Vault %s is already running' % self.name)
 
+        with open(self.server_config) as file:
+            configuration = json.load(file)['listener']['tcp']
+            if configuration.get('tls_disable', False):
+                addr = 'http://%s' % configuration['address']
+            else:
+                addr = 'https://%s' % configuration['address']
+            base = os.path.dirname(self.server_config)
+            data = {
+                'addr': addr,
+                'key': os.path.join(base, 'server.key'),
+                'crt': os.path.join(base, 'server.crt'),
+                'csr': os.path.join(base, 'server.csr'),
+            }
+
+        self._data = Namespace()
+        self._data.update(data)
+
         env = os.environ.copy()
         env.setdefault('GOMAXPROCS', '2')
         # env['SSL_CERT_DIR'] = os.path.join(HERE, 'certs')
@@ -163,29 +180,17 @@ class VaultTLS:
         logging.info('Starting %s [%s]' % (self.name, proc.pid))
 
         sleep(1)
+        if proc.poll() is not None:
+            print('Unable to start server, returncode', proc.returncode)
+            print(proc.stdout.read())
+            return
+
         # buf = ''
         # while 'Vault server started!' not in buf:
         #     buf += proc.stdout.read(1).decode('utf-8')
         #
         # logging.debug(buf)
 
-        with open(self.server_config) as file:
-            configuration = json.load(file)['listener']['tcp']
-            if configuration.get('tls_disable', False):
-                addr = 'http://%s' % configuration['address']
-            else:
-                addr = 'https://%s' % configuration['address']
-            base = os.path.dirname(self.server_config)
-            data = {
-                'addr': addr,
-                'key': os.path.join(base, 'server.key'),
-                'crt': os.path.join(base, 'server.crt'),
-                'csr': os.path.join(base, 'server.csr'),
-            }
-
-        # env.setdefault('VAULT_ADDR', data['addr'])
-        self._data = Namespace()
-        self._data.update(data)
         logging.info('Vault %s [%s] is ready to rock %s',
                      self.name,
                      proc.pid,
