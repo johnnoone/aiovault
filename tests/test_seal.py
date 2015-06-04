@@ -26,6 +26,5 @@ def test_seal(dev_server):
     status = yield from client.seal.status()
     assert status.sealed is True
 
-    status = yield from client.seal.unseal(dev_server.shares,
-                                           dev_server.unseal_key)
+    status = yield from client.seal.unseal(dev_server.unseal_key)
     assert status.sealed is False

@@ -12,6 +12,10 @@ PATTERN_CRITERIAS = re.compile('Vault initialized with (?P<shares>\d+) keys and 
 Response = namedtuple('Response', 'cmd stdout stderr code')
 
 
+class CLIError(Exception):
+    pass
+
+        
 class VaultCLI:
     def __init__(self, config):
         self.config = config
@@ -63,5 +67,7 @@ class VaultCLI:
             env.setdefault('VAULT_TOKEN', self.config.root_token)
         shell = not isinstance(cmd, (list, tuple))
         proc = Popen(cmd, stdout=PIPE, stderr=PIPE, env=env, shell=shell)
-        a, b = proc.communicate()
-        return Response(cmd, a, b, proc.returncode)
+        stdout, stderr = proc.communicate()
+        if not proc.returncode:
+            return Response(cmd, stdout, stderr, proc.returncode)
+        raise CLIError(stderr.decode('utf-8'), proc.returncode)
