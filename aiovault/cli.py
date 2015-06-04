@@ -15,7 +15,7 @@ Response = namedtuple('Response', 'cmd stdout stderr code')
 class CLIError(Exception):
     pass
 
-        
+
 class VaultCLI:
     def __init__(self, config):
         self.config = config

@@ -179,17 +179,11 @@ class VaultTLS:
 
         logging.info('Starting %s [%s]' % (self.name, proc.pid))
 
-        sleep(1)
-        if proc.poll() is not None:
-            print('Unable to start server, returncode', proc.returncode)
-            print(proc.stdout.read())
-            return
+        buf = ''
+        while 'Vault server started!' not in buf:
+            buf += proc.stdout.read(1).decode('utf-8')
 
-        # buf = ''
-        # while 'Vault server started!' not in buf:
-        #     buf += proc.stdout.read(1).decode('utf-8')
-        #
-        # logging.debug(buf)
+        logging.debug(buf)
 
         logging.info('Vault %s [%s] is ready to rock %s',
                      self.name,
