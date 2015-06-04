@@ -12,11 +12,11 @@ class Request:
     def __init__(self, addr, version, token=None, cert=None):
         self.addr = addr
         self.version = version
-        self.token = token
+        self._token = token
 
         cookies = {}
-        if self.token:
-            cookies.setdefault('token', self.token)
+        if self._token:
+            cookies.setdefault('token', self._token)
 
         connector = None
         use_ssl = addr.startswith('https://') or cert
@@ -28,12 +28,27 @@ class Request:
                 self.addr = n
 
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-            context.verify_mode = ssl.CERT_NONE
             if cert:
-                context.load_cert_chain(*cert)
+                try:
+                    certfile, keyfile, cafile = cert
+                    context.verify_mode = ssl.CERT_REQUIRED
+                    context.load_cert_chain(certfile, keyfile)
+                    context.load_verify_locations(cafile=cafile)
+                except ValueError:
+                    context.verify_mode = ssl.CERT_NONE
+                    context.load_cert_chain(*cert)
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
+
+    @property
+    def token(self):
+        return self._token
+
+    @token.setter
+    def token(self, value):
+        self._token = value
+        self.session._update_cookies({'token': value})
 
     @asyncio.coroutine
     def request(self, method, path, **kwargs):

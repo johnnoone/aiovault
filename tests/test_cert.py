@@ -1,52 +1,36 @@
 from aiovault import Vault
 from conftest import async_test
-import pytest
 import os.path
 
-# @async_test
-# def test_cert(dev_server, env):
-#     client = Vault(dev_server.addr, token=dev_server.root_token)
-#
-#     backend = yield from client.auth.enable('cert')
-#     assert backend.__repr__() == "<CertBackend(name='cert')>"
-#
-#     filename = os.path.join(env.CERT_PATH, 'server.crt')
-#     with open(filename) as file:
-#         added = yield from backend.write_cert('foo', certificate=file.read())
-#         assert added
-#
-#     certs = [
-#         os.path.join(env.CERT_PATH, 'server.key'),
-#         os.path.join(env.CERT_PATH, 'server.crt'),
-#     ]
-#     client = Vault('https://127.0.0.1:8200')
-#     backend = client.auth.load('cert')
-#     res =  yield from backend.login('cert', cert=certs)
-#     print(res)
-#     assert False
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
-@pytest.mark.skipif(True, reason="not ready")
 @async_test
-def test_cert_ca(dev_server, env):
-    client = Vault(dev_server.addr, token=dev_server.root_token)
+def test_cert(server, env):
+    client = Vault(server.addr, cert=[server.csr, server.key])
+    state = yield from client.initialize(secret_shares=5, secret_threshold=3)
+    yield from client.seal.unseal(state.keys)
+    yield from client.audit.enable('file', path='/tmp/aiovault.log')
 
     backend = yield from client.auth.enable('cert')
     assert backend.__repr__() == "<CertBackend(name='cert')>"
 
-    filename = os.path.join(env.CERT_PATH, 'ca', 'root.cer')
-    with open(filename) as file:
-        added = yield from backend.write_cert('web',
-                                              certificate=file.read(),
-                                              policies='foo')
-        assert added
+    cafile = os.path.join(HERE, 'certs2', 'root.cer')
+    certfile = os.path.join(HERE, 'certs2', 'ourdomain.cer')
+    keyfile = os.path.join(HERE, 'certs2', 'ourdomain.key')
+    with open(cafile) as file:
+        written = yield from backend.write_cert('foo',
+                                                certificate=file.read(),
+                                                policies=['pierre', 'pol'])
+        assert written
 
-    certs = [
-        os.path.join(env.CERT_PATH, 'key', 'ourdomain.cer'),
-        os.path.join(env.CERT_PATH, 'key', 'ourdomain.key'),
-    ]
-    client = Vault('http://127.0.0.1:8200')
+    data = yield from backend.read_cert('foo')
+    assert 'pierre' in data['policies']
+
+    client = Vault(server.addr, cert=[certfile, keyfile])
     backend = client.auth.load('cert')
-    res = yield from backend.login('cert', cert=certs)
+
+    # does not work for now
+    return
+    res = yield from backend.login()
     print(res)
-    assert False

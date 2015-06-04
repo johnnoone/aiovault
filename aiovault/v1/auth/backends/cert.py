@@ -1,7 +1,5 @@
-import logging
 from .bases import AuthBackend
 from aiovault.objects import Value
-from aiovault.request import Request
 from aiovault.token import authenticate
 from aiovault.util import format_duration, format_policies, task
 
@@ -19,25 +17,14 @@ class CertBackend(AuthBackend):
     """
 
     @task
-    def login(self, *, cert):
+    def login(self):
         """
         Returns:
             LoginToken
         """
         method = 'POST'
-        path = '/auth/%s/certs/login' % self.name
-        if cert is True:
-            # use current handler
-            logging.info('use current certificate')
-            req_handler = self.req_handler
-        else:
-            logging.info('exchange certificate')
-            req_handler = Request(self.req_handler.addr,
-                                  self.req_handler.version,
-                                  self.req_handler.token,
-                                  cert)
-
-        token = yield from authenticate(req_handler,
+        path = '/auth/%s/login' % self.name
+        token = yield from authenticate(self.req_handler,
                                         method,
                                         path)
         return token

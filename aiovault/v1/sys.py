@@ -45,7 +45,12 @@ class SysEndpoint:
 
         response = yield from self.req_handler(method, path, json=data)
         result = yield from response.json()
-        return Initial(**result)
+        initial = Initial(**result)
+
+        # add the fresh token to the req_handler
+        self.req_handler.token = initial.root_token
+
+        return initial
 
     @task
     def leader(self):
