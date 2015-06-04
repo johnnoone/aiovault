@@ -63,18 +63,12 @@ class Vault:
                       stdout=PIPE,
                       stderr=PIPE,
                       env=env,
-                      shell=False,
-                      timeout=5)
+                      shell=False)
         clean.communicate()
 
         args = ['vault', 'server', '-dev']
 
-        proc = Popen(args,
-                     stdout=PIPE,
-                     stderr=PIPE,
-                     env=env,
-                     shell=False,
-                     timeout=30)
+        proc = Popen(args, stdout=PIPE, stderr=PIPE, env=env, shell=False)
         self._proc = proc
 
         logging.info('Starting %s [%s]' % (self.name, proc.pid))
@@ -153,11 +147,7 @@ class VaultTLS:
         # env['SSL_CERT_DIR'] = os.path.join(HERE, 'certs')
 
         clean = Popen(['killall', 'vault'],
-                      stdout=PIPE,
-                      stderr=PIPE,
-                      env=env,
-                      shell=False,
-                      timeout=5)
+                      stdout=PIPE, stderr=PIPE, env=env, shell=False)
         clean.communicate()
         cwd = os.path.dirname(self.server_config)
         args = ['vault', 'server', '-config', self.server_config]
@@ -167,17 +157,17 @@ class VaultTLS:
                      stderr=PIPE,
                      env=env,
                      shell=False,
-                     cwd=cwd,
-                     timeout=30)
+                     cwd=cwd)
         self._proc = proc
 
         logging.info('Starting %s [%s]' % (self.name, proc.pid))
 
-        buf = ''
-        while 'Vault server started!' not in buf:
-            buf += proc.stdout.read(1).decode('utf-8')
-
-        logging.debug(buf)
+        sleep(1)
+        # buf = ''
+        # while 'Vault server started!' not in buf:
+        #     buf += proc.stdout.read(1).decode('utf-8')
+        #
+        # logging.debug(buf)
 
         with open(self.server_config) as file:
             configuration = json.load(file)['listener']['tcp']
