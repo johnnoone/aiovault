@@ -182,8 +182,9 @@ class VaultTLS:
         buf = ''
         while 'Vault server started!' not in buf:
             buf += proc.stdout.read(1).decode('utf-8')
-
         logging.debug(buf)
+
+        sleep(2)
 
         logging.info('Vault %s [%s] is ready to rock %s',
                      self.name,

@@ -10,12 +10,13 @@ env:
     - PG_URL='user=postgres dbname=postgres sslmode=disable'
 
 install:
+  - sudo update-ca-certificates
   - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y install rsyslog
   - pip install -r requirements-tests.txt
   - pip install pytest pytest-cov pytest-pep8 coveralls
   - python setup.py develop
-  - wget https://dl.bintray.com/mitchellh/consul/0.5.0_linux_amd64.zip
-  - unzip 0.5.0_linux_amd64.zip
+  - wget https://dl.bintray.com/mitchellh/consul/0.5.2_linux_amd64.zip
+  - unzip 0.5.2_linux_amd64.zip
   - wget https://dl.bintray.com/mitchellh/vault/vault_0.1.2_linux_amd64.zip
   - unzip vault_0.1.2_linux_amd64.zip
 before_script:
