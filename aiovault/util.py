@@ -89,6 +89,11 @@ class lazy_property:
             return value
         return self
 
+
+def ok(response):
+    response.close()
+    return response.status == 204
+
 try:
     # python >= 3.4
     from contextlib import suppress

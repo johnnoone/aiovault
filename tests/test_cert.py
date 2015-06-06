@@ -15,10 +15,11 @@ def test_cert(server, env):
     backend = yield from client.auth.enable('cert')
     assert backend.__repr__() == "<CertBackend(name='cert')>"
 
-    cafile = os.path.join(HERE, 'certs2', 'root.cer')
-    certfile = os.path.join(HERE, 'certs2', 'ourdomain.cer')
-    keyfile = os.path.join(HERE, 'certs2', 'ourdomain.key')
-    with open(cafile) as file:
+    crt_file = os.path.join(HERE, 'certs2', 'server.crt')
+    csr_file = os.path.join(HERE, 'certs2', 'server.csr')
+    key_file = os.path.join(HERE, 'certs2', 'server.key')
+
+    with open(crt_file) as file:
         written = yield from backend.write_cert('foo',
                                                 certificate=file.read(),
                                                 policies=['pierre', 'pol'])
@@ -27,10 +28,10 @@ def test_cert(server, env):
     data = yield from backend.read_cert('foo')
     assert 'pierre' in data['policies']
 
-    client = Vault(server.addr, cert=[certfile, keyfile])
-    backend = client.auth.load('cert')
-
-    # does not work for now
+    # TODO does not work with Vault v0.1.2
     return
+
+    client = Vault(server.addr, cert=[csr_file, key_file])
+    backend = client.auth.load('cert')
     res = yield from backend.login()
     print(res)

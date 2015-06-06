@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import task
+from aiovault.util import ok, task
 
 
 class GenericBackend(SecretBackend):
@@ -49,7 +49,7 @@ class GenericBackend(SecretBackend):
         data = values
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete(self, key):
@@ -64,4 +64,4 @@ class GenericBackend(SecretBackend):
         path = '/%s/%s' % (self.name, key)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)

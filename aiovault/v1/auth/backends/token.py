@@ -1,6 +1,6 @@
 from aiovault.exceptions import InvalidPath
 from aiovault.token import ReadToken, LoginToken
-from aiovault.util import format_duration, task
+from aiovault.util import format_duration, ok, task
 
 
 class TokenBackend:
@@ -141,7 +141,7 @@ class TokenBackend:
         path = '/auth/%s/revoke-prefix/%s' % (self.name, prefix)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def renew(self, token, increment=None):

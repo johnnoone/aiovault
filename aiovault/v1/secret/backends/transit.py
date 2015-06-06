@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import base64_encode, base64_decode, task
+from aiovault.util import base64_encode, base64_decode, ok, task
 
 
 class TransitBackend(SecretBackend):
@@ -42,7 +42,7 @@ class TransitBackend(SecretBackend):
         path = '/%s/keys/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete_key(self, name):
@@ -60,7 +60,7 @@ class TransitBackend(SecretBackend):
         path = '/%s/keys/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def encrypt(self, key, plaintext):

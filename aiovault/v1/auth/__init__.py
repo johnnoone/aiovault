@@ -6,7 +6,7 @@
 
 from .backends import load_backend
 from collections.abc import Mapping
-from aiovault.util import task
+from aiovault.util import ok, task
 
 __all__ = ['authenticate', 'AuthEndpoint', 'AuthCollection']
 
@@ -92,7 +92,7 @@ class AuthEndpoint:
         path = '/sys/auth/%s' % name
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
 
 class AuthCollection(Mapping):

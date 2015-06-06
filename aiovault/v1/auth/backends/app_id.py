@@ -1,7 +1,7 @@
 from .bases import AuthBackend
 from aiovault.objects import Value
 from aiovault.token import authenticate
-from aiovault.util import format_policies, task
+from aiovault.util import format_policies, ok, task
 
 
 class AppIDBackend(AuthBackend):
@@ -63,7 +63,7 @@ class AppIDBackend(AuthBackend):
                 'value': policies}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def write_user(self, user, app_id, cidr_block=None):
@@ -84,4 +84,4 @@ class AppIDBackend(AuthBackend):
                 'cidr_block': cidr_block}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)

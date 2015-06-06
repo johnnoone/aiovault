@@ -1,5 +1,5 @@
 from aiovault.objects import Value
-from aiovault.util import format_duration, task
+from aiovault.util import format_duration, ok, task
 
 
 class LeaseEndpoint:
@@ -39,7 +39,7 @@ class LeaseEndpoint:
         path = '/sys/revoke/%s' % lease_id
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def revoke_prefix(self, path_prefix):
@@ -54,4 +54,4 @@ class LeaseEndpoint:
         path = '/sys/revoke-prefix/%s' % path_prefix
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)

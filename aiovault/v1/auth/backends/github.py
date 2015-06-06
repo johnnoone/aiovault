@@ -1,6 +1,6 @@
 from .bases import AuthBackend
 from aiovault.token import authenticate
-from aiovault.util import format_policies, task
+from aiovault.util import format_policies, ok, task
 
 
 class GitHubBackend(AuthBackend):
@@ -39,7 +39,7 @@ class GitHubBackend(AuthBackend):
         data = {'organization': organization}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def write_team(self, name, policies):
@@ -57,4 +57,4 @@ class GitHubBackend(AuthBackend):
         data = {'value': policies}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)

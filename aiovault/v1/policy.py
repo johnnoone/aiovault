@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.policy import Policy
-from aiovault.util import suppress, task
+from aiovault.util import suppress, ok, task
 
 
 class PolicyEndpoint:
@@ -67,7 +67,7 @@ class PolicyEndpoint:
         data = {'rules': json.dumps({'path': rules})}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete(self, name):
@@ -87,4 +87,4 @@ class PolicyEndpoint:
         path = '/sys/policy/%s' % name
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)

@@ -1,5 +1,5 @@
 from aiovault.objects import SealStatus
-from aiovault.util import task
+from aiovault.util import ok, task
 
 
 class SealEndpoint:
@@ -32,7 +32,7 @@ class SealEndpoint:
         path = '/sys/seal'
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def unseal(self, keys):

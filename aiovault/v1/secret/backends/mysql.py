@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import format_duration, task
+from aiovault.util import format_duration, ok, task
 
 
 class MySQLBackend(SecretBackend):
@@ -39,7 +39,7 @@ class MySQLBackend(SecretBackend):
         data = {'value': dsn}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def config_lease(self, lease, lease_max):
@@ -63,7 +63,7 @@ class MySQLBackend(SecretBackend):
                 'lease_max': format_duration(lease_max)}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def read_role(self, name):
@@ -121,7 +121,7 @@ class MySQLBackend(SecretBackend):
         data = {'sql': sql}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete_role(self, name):
@@ -136,7 +136,7 @@ class MySQLBackend(SecretBackend):
         path = '/%s/roles/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def creds(self, name):

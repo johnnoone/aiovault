@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import format_duration, task
+from aiovault.util import format_duration, ok, task
 
 
 class AWSBackend(SecretBackend):
@@ -56,7 +56,7 @@ class AWSBackend(SecretBackend):
                 'region': region}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def config_lease(self, *, lease, lease_max):
@@ -85,7 +85,7 @@ class AWSBackend(SecretBackend):
                 'lease_max': format_duration(lease_max)}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def write_role(self, name, *, policy):
@@ -112,7 +112,7 @@ class AWSBackend(SecretBackend):
         data = {'policy': policy}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def read_role(self, name):
@@ -146,7 +146,7 @@ class AWSBackend(SecretBackend):
         path = '/%s/roles/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def creds(self, name):

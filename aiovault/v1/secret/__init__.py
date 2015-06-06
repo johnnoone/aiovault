@@ -8,7 +8,7 @@ import logging
 from .backends import load_backend
 from collections.abc import Mapping
 from aiovault.exceptions import InternalServerError
-from aiovault.util import task
+from aiovault.util import ok, task
 
 __all__ = ['SecretEndpoint', 'SecretCollection']
 
@@ -102,7 +102,7 @@ class SecretEndpoint:
 
         try:
             response = yield from self.req_handler(method, path)
-            return response.status == 204
+            return ok(response)
         except InternalServerError:
             return False
 
@@ -124,7 +124,7 @@ class SecretEndpoint:
                 'to': dest}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
 
 class SecretCollection(Mapping):

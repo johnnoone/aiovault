@@ -1,6 +1,6 @@
 from abc import ABCMeta
 from aiovault.exceptions import HTTPError, MountError
-from aiovault.util import task
+from aiovault.util import ok, task
 
 
 class SecretBackend(metaclass=ABCMeta):
@@ -26,7 +26,7 @@ class SecretBackend(metaclass=ABCMeta):
 
         try:
             response = yield from self.req_handler(method, path, json=data)
-            if response.status == 204:
+            if ok(response):
                 self.name = name
                 return
         except HTTPError as error:
@@ -42,7 +42,7 @@ class SecretBackend(metaclass=ABCMeta):
 
         try:
             response = yield from self.req_handler(method, path)
-            if response.status == 204:
+            if ok(response):
                 return
         except HTTPError as error:
             raise MountError(*error.errors)
@@ -63,7 +63,7 @@ class SecretBackend(metaclass=ABCMeta):
 
         try:
             response = yield from self.req_handler(method, path, json=data)
-            if response.status == 204:
+            if ok(response):
                 self.name = dest
                 return
         except HTTPError as error:

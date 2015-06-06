@@ -1,6 +1,6 @@
 from .bases import AuthBackend
 from aiovault.token import authenticate
-from aiovault.util import task
+from aiovault.util import ok, task
 
 
 class UserPassBackend(AuthBackend):
@@ -50,4 +50,4 @@ class UserPassBackend(AuthBackend):
                 'policies': policies}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)

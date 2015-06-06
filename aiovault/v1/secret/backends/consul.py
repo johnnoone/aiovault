@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath, InvalidRequest
 from aiovault.objects import Value
-from aiovault.util import base64_encode, task
+from aiovault.util import base64_encode, ok, task
 
 
 class ConsulBackend(SecretBackend):
@@ -32,7 +32,7 @@ class ConsulBackend(SecretBackend):
                 'scheme': scheme}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def read_role(self, name):
@@ -68,7 +68,7 @@ class ConsulBackend(SecretBackend):
         data = {'policy': base64_encode(policy)}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete_role(self, name):
@@ -83,7 +83,7 @@ class ConsulBackend(SecretBackend):
         path = '/%s/roles/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def creds(self, name):

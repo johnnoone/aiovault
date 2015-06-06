@@ -2,7 +2,7 @@ from .bases import AuthBackend
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
 from aiovault.token import authenticate
-from aiovault.util import format_policies, task
+from aiovault.util import format_policies, ok, task
 
 
 class LDAPBackend(AuthBackend):
@@ -57,7 +57,7 @@ class LDAPBackend(AuthBackend):
                 'groupdn': groupdn}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def read_group(self, name):
@@ -97,7 +97,7 @@ class LDAPBackend(AuthBackend):
         data = {'policies': format_policies(policies)}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete_group(self, name):
@@ -116,4 +116,4 @@ class LDAPBackend(AuthBackend):
         path = '/auth/%s/groups/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)

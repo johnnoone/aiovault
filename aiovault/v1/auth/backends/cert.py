@@ -1,7 +1,7 @@
 from .bases import AuthBackend
 from aiovault.objects import Value
 from aiovault.token import authenticate
-from aiovault.util import format_duration, format_policies, task
+from aiovault.util import format_duration, format_policies, ok, task
 
 
 class CertBackend(AuthBackend):
@@ -51,7 +51,7 @@ class CertBackend(AuthBackend):
                 'lease': format_duration(lease)}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def read_cert(self, name):
@@ -78,4 +78,4 @@ class CertBackend(AuthBackend):
         path = '/auth/%s/certs/%s' % (self.name, name)
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)

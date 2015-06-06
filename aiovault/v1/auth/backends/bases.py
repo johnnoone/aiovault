@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from aiovault.util import task
+from aiovault.util import ok, task
 
 
 class AuthBackend(metaclass=ABCMeta):
@@ -30,7 +30,7 @@ class AuthBackend(metaclass=ABCMeta):
                 'description': description}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def disable(self):
@@ -43,7 +43,7 @@ class AuthBackend(metaclass=ABCMeta):
         path = '/sys/auth/%s' % self.name
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     def __repr__(self):
         return '<%s(name=%r)>' % (self.__class__.__name__, self.name)

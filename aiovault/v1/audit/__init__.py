@@ -1,5 +1,5 @@
 from .backends import load_backend
-from aiovault.util import task
+from aiovault.util import ok, task
 
 
 class AuditEndpoint:
@@ -35,7 +35,7 @@ class AuditEndpoint:
                 'description': description,
                 'options': options}
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def disable(self, name):
@@ -50,7 +50,7 @@ class AuditEndpoint:
         path = '/sys/audit/%s' % name
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
 
     @task
     def get(self, name):

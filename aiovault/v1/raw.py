@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import suppress, task
+from aiovault.util import suppress, ok, task
 
 
 class RawEndpoint:
@@ -51,7 +51,7 @@ class RawEndpoint:
         data = {'value': json.dumps(value)}
 
         response = yield from self.req_handler(method, path, json=data)
-        return response.status == 204
+        return ok(response)
 
     @task
     def delete(self, key):
@@ -66,4 +66,4 @@ class RawEndpoint:
         path = '/sys/raw/%s' % key
 
         response = yield from self.req_handler(method, path)
-        return response.status == 204
+        return ok(response)
