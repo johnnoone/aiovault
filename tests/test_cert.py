@@ -20,7 +20,6 @@ def test_cert(server, env):
     backend = yield from client.auth.enable('cert')
     assert backend.__repr__() == "<CertBackend(name='cert')>"
 
-
     with open(csr_file) as file:
         written = yield from backend.write_cert('foo',
                                                 certificate=file.read(),
