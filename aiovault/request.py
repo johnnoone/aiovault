@@ -38,6 +38,7 @@ class Request:
                     context.verify_mode = ssl.CERT_NONE
                     context.load_cert_chain(*cert)
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
+            connector = TCPConnector(verify_ssl=False)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
 
