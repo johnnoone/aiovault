@@ -21,8 +21,8 @@ install:
   - unzip vault_0.1.2_linux_amd64.zip
 before_script:
   - export PATH=$PATH:$PWD
-  - python tests/tls.py --directory certs tls
-  - python tests/tls.py --directory certs2 tls
+  - python tests/tls.py --directory --name server tls
+  - python tests/tls.py --directory --name client tls
 script:
   - py.test --pep8 aiovault -v --cov aiovault --cov-report term-missing tests
 after_success:

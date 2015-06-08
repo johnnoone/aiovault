@@ -134,9 +134,9 @@ def run_server(directory, config):
 
 
 def handle_keys(args, parser):
-    crt = 'server.crt'
-    csr = 'server.csr'
-    key = 'server.key'
+    crt = '%s.crt' % args.name
+    csr = '%s.csr' % args.name
+    key = '%s.key' % args.name
     names = args.names or ['127.0.0.1', 'example.com']
     generate_keys(args.directory, crt, csr, key, names)
 
@@ -157,6 +157,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser('generate tls and server config')
     parser.add_argument('--directory', default='certs')
+    parser.add_argument('--name', default='server')
     subparsers = parser.add_subparsers(title='commands')
 
     parser_a = subparsers.add_parser('tls', help='generate keys')

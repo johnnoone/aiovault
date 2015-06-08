@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os.path
 import ssl
 from .exceptions import DownError, HTTPError, InvalidRequest, InvalidPath
 from .exceptions import InternalServerError, RateLimitExceeded, Unauthorized
@@ -28,17 +29,21 @@ class Request:
                 self.addr = n
 
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            context.options |= ssl.OP_NO_SSLv2
+            context.options |= ssl.OP_NO_SSLv3
             if cert:
                 try:
                     certfile, keyfile, cafile = cert
                     context.verify_mode = ssl.CERT_REQUIRED
                     context.load_cert_chain(certfile, keyfile)
-                    context.load_verify_locations(cafile=cafile)
+                    if os.path.isdir(cafile):
+                        context.load_verify_locations(capath=cafile)
+                    else:
+                        context.load_verify_locations(cafile=cafile)
                 except ValueError:
                     context.verify_mode = ssl.CERT_NONE
                     context.load_cert_chain(*cert)
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
-            connector = TCPConnector(verify_ssl=False)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
 
