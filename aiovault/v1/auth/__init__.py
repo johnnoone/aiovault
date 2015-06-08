@@ -16,6 +16,10 @@ class AuthEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @property
+    def path(self):
+        return '/sys/auth'
+
     @task
     def items(self):
         """Lists all the enabled auth backends
@@ -24,7 +28,7 @@ class AuthEndpoint:
             AuthCollection
         """
         method = 'GET'
-        path = '/sys/auth'
+        path = self.path
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -89,7 +93,7 @@ class AuthEndpoint:
             name (str): The name of mount
         """
         method = 'DELETE'
-        path = '/sys/auth/%s' % name
+        path = '%s/%s' % (self.path, name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

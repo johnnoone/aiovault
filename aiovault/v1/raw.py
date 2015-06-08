@@ -15,6 +15,10 @@ class RawEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @property
+    def path(self):
+        return '/sys/raw'
+
     @task
     def read(self, key):
         """Reads the value of the key at the given path.
@@ -25,7 +29,7 @@ class RawEndpoint:
             Value: The key value
         """
         method = 'GET'
-        path = '/sys/raw/%s' % key
+        path = '%s/%s' % (self.path, key)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -47,7 +51,7 @@ class RawEndpoint:
             bool: The key has been written
         """
         method = 'PUT'
-        path = '/sys/raw/%s' % key
+        path = '%s/%s' % (self.path, key)
         data = {'value': json.dumps(value)}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -63,7 +67,7 @@ class RawEndpoint:
             bool: The key does not exists in storage
         """
         method = 'DELETE'
-        path = '/sys/raw/%s' % key
+        path = '%s/%s' % (self.path, key)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

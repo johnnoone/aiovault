@@ -7,6 +7,10 @@ class SysEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @property
+    def path(self):
+        return '/sys/init'
+
     @task
     def status(self):
         """Return the initialization status of a Vault
@@ -14,9 +18,8 @@ class SysEndpoint:
         Returns:
             Status: vault server status
         """
-
         method = 'GET'
-        path = '/sys/init'
+        path = self.path
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -39,7 +42,7 @@ class SysEndpoint:
             Initial: Includes the master keys and initial root token
         """
         method = 'PUT'
-        path = '/sys/init'
+        path = self.path
         data = {'secret_shares': secret_shares,
                 'secret_threshold': secret_threshold}
 

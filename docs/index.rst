@@ -17,6 +17,14 @@ Installation
 Tutorial
 --------
 
+Many core ideas & API calls are explained in the tutorial/getting-started
+document:
+
+.. toctree::
+    :maxdepth: 2
+
+    quickstart
+
 
 Design
 ------

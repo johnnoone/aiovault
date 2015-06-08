@@ -13,6 +13,10 @@ class AuditEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @property
+    def path(self):
+        return '/sys/audit'
+
     @task
     def enable(self, name, *, type=None, description=None, **options):
         """Enable an audit backend.
@@ -30,7 +34,7 @@ class AuditEndpoint:
         obj = load_backend(type, name, req_handler=self.req_handler)
         options = obj.validate(**options)
         method = 'PUT'
-        path = '/sys/audit/%s' % name
+        path = '%s/%s' % (self.path, name)
         data = {'type': type,
                 'description': description,
                 'options': options}
@@ -47,7 +51,7 @@ class AuditEndpoint:
             bool
         """
         method = 'DELETE'
-        path = '/sys/audit/%s' % name
+        path = '%s/%s' % (self.path, name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -69,7 +73,7 @@ class AuditEndpoint:
         """Disable the given audit backend.
         """
         method = 'GET'
-        path = '/sys/audit'
+        path = self.path
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()

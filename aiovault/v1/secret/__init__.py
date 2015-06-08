@@ -18,6 +18,10 @@ class SecretEndpoint:
     def __init__(self, req_handler):
         self.req_handler = req_handler
 
+    @property
+    def path(self):
+        return '/sys/mounts'
+
     @task
     def items(self):
         """Lists all the mounted secret backends
@@ -26,7 +30,7 @@ class SecretEndpoint:
             SecretCollection
         """
         method = 'GET'
-        path = '/sys/mounts'
+        path = self.path
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -98,7 +102,7 @@ class SecretEndpoint:
         """
         name = getattr(name, 'name', name)
         method = 'DELETE'
-        path = '/sys/mounts/%s' % name
+        path = '%s/%s' % (self.path, name)
 
         try:
             response = yield from self.req_handler(method, path)

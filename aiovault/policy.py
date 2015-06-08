@@ -1,7 +1,7 @@
 from collections.abc import MutableMapping
 
 
-class Policy(MutableMapping):
+class Rules(MutableMapping):
 
     def __init__(self, *, name, rules=None):
         """
@@ -39,9 +39,9 @@ class Policy(MutableMapping):
         return len(self.rules)
 
     def __eq__(self, other):
-        if isinstance(other, Policy):
+        if isinstance(other, Rules):
             other == other.rules
         return self.rules == other
 
     def __repr__(self):
-        return '<Policy(name=%r, rules=%r)>' % (self.name, self.rules)
+        return '<Rules(name=%r, rules=%r)>' % (self.name, self.rules)

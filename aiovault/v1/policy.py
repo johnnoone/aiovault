@@ -1,6 +1,6 @@
 import json
 from aiovault.exceptions import InvalidPath
-from aiovault.policy import Policy
+from aiovault.policy import Rules
 from aiovault.util import suppress, ok, task
 
 
@@ -8,6 +8,10 @@ class PolicyEndpoint:
 
     def __init__(self, req_handler):
         self.req_handler = req_handler
+
+    @property
+    def path(self):
+        return '/sys/policy'
 
     @task
     def items(self):
@@ -17,7 +21,7 @@ class PolicyEndpoint:
             set: Policy names
         """
         method = 'GET'
-        path = '/sys/policy'
+        path = self.path
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -30,11 +34,11 @@ class PolicyEndpoint:
         Parameters:
             name (str): The policy name
         Returns:
-            Policy: The policy
+            Rules: The rules
         """
         name = getattr(name, 'name', name)
         method = 'GET'
-        path = '/sys/policy/%s' % name
+        path = '%s/%s' % (self.path, name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -43,27 +47,27 @@ class PolicyEndpoint:
             with suppress(KeyError, ValueError):
                 name = result['name']
                 rules = json.loads(result['rules']).get('path', None)
-            return Policy(name=name, rules=rules)
+            return Rules(name=name, rules=rules)
         except InvalidPath:
             raise KeyError('%r does not exists' % name)
 
     @task
     def write(self, name, rules):
-        """Write a policy with the given name and rules.
+        """Sets rules to the given name.
 
         Once a policy is updated, it takes effect immediately to all
         associated users.
 
         Parameters:
             name (str): The policy name
-            rules (obj): The policy document.
+            rules (dict): The rules.
         Returns:
-            bool: Policy has been written
+            bool: Rules has been written
         """
         name = getattr(name, 'name', name)
         rules = getattr(rules, 'rules', rules)
         method = 'PUT'
-        path = '/sys/policy/%s' % name
+        path = '%s/%s' % (self.path, name)
         data = {'rules': json.dumps({'path': rules})}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -71,7 +75,7 @@ class PolicyEndpoint:
 
     @task
     def delete(self, name):
-        """Delete the policy with the given name.
+        """Delete the rules with the given name.
 
         This will immediately affect all associated users. When a user
         is associated with a policy that doesn't exist, it is identical
@@ -84,7 +88,50 @@ class PolicyEndpoint:
         """
         name = getattr(name, 'name', name)
         method = 'DELETE'
-        path = '/sys/policy/%s' % name
+        path = '%s/%s' % (self.path, name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
+
+    @task
+    def write_path(self, name, path, policy):
+        """Set one rule to a given policy
+
+        Parameters:
+            name (str): The policy name
+            path (str): The path
+            policy (str): The policy
+        Returns:
+            bool: Path has been written
+        """
+        try:
+            rules = yield from self.read(name)
+        except KeyError:
+            rules = Rules(name)
+
+        if hasattr(path, 'path'):
+            path = path.path
+            if path.startswith('/'):
+                path = path[1:]
+        rules[path] = policy
+        response = yield from self.write(name, rules=rules)
+        return response
+
+    @task
+    def delete_path(self, name, path):
+        """Delete one rule from a given policy
+
+        Parameters:
+            name (str): The policy name
+            path (str): The path
+        Returns:
+            bool: Path has been deleted from policy
+        """
+        try:
+            rules = yield from self.read(name)
+            path = getattr(path, 'path', path)
+            del rules[path]
+        except KeyError:
+            return False
+        response = yield from self.write(name, rules=rules)
+        return response
