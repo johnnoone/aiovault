@@ -1,6 +1,6 @@
 from aiovault.exceptions import InvalidPath
 from aiovault.token import ReadToken, LoginToken
-from aiovault.util import format_duration, ok, task
+from aiovault.util import format_duration, ok, task, Path
 
 
 class TokenBackend:
@@ -9,6 +9,10 @@ class TokenBackend:
         self.name = name
         self.type = type  # this is silly
         self.req_handler = req_handler
+
+    @property
+    def path(self):
+        return Path('/auth/%s' % self.name)
 
     @task
     def create(self, *, id=None, policies=None, metadata=None, no_parent=None,
