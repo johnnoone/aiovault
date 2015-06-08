@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.objects import Value
-from aiovault.util import suppress, ok, task
+from aiovault.util import suppress, ok, task, Path
 
 
 class RawEndpoint:
@@ -17,7 +17,7 @@ class RawEndpoint:
 
     @property
     def path(self):
-        return '/sys/raw'
+        return Path('/sys/raw')
 
     @task
     def read(self, key):
@@ -29,7 +29,7 @@ class RawEndpoint:
             Value: The key value
         """
         method = 'GET'
-        path = '%s/%s' % (self.path, key)
+        path = self.path(key)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -51,7 +51,7 @@ class RawEndpoint:
             bool: The key has been written
         """
         method = 'PUT'
-        path = '%s/%s' % (self.path, key)
+        path = self.path(key)
         data = {'value': json.dumps(value)}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -67,7 +67,7 @@ class RawEndpoint:
             bool: The key does not exists in storage
         """
         method = 'DELETE'
-        path = '%s/%s' % (self.path, key)
+        path = self.path(key)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

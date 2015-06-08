@@ -1,6 +1,6 @@
 from abc import ABCMeta
 from aiovault.exceptions import HTTPError, MountError
-from aiovault.util import ok, task
+from aiovault.util import ok, task, Path
 
 
 class SecretBackend(metaclass=ABCMeta):
@@ -9,6 +9,10 @@ class SecretBackend(metaclass=ABCMeta):
         self.name = name
         self.type = type
         self.req_handler = req_handler
+
+    @property
+    def path(self):
+        return Path('/%s' % self.name)
 
     @task
     def mount(self, *, name=None, description=None):

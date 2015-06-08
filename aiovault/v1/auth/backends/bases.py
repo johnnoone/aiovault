@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from aiovault.util import ok, task
+from aiovault.util import ok, task, Path
 
 
 class AuthBackend(metaclass=ABCMeta):
@@ -8,6 +8,10 @@ class AuthBackend(metaclass=ABCMeta):
         self.name = name
         self.type = type
         self.req_handler = req_handler
+
+    @property
+    def path(self):
+        return Path('/auth/%s' % self.name)
 
     @task
     @abstractmethod

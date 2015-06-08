@@ -8,7 +8,7 @@ import logging
 from .backends import load_backend
 from collections.abc import Mapping
 from aiovault.exceptions import InternalServerError
-from aiovault.util import ok, task
+from aiovault.util import ok, task, Path
 
 __all__ = ['SecretEndpoint', 'SecretCollection']
 
@@ -20,7 +20,7 @@ class SecretEndpoint:
 
     @property
     def path(self):
-        return '/sys/mounts'
+        return Path('/sys/mounts')
 
     @task
     def items(self):
@@ -102,7 +102,7 @@ class SecretEndpoint:
         """
         name = getattr(name, 'name', name)
         method = 'DELETE'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
 
         try:
             response = yield from self.req_handler(method, path)

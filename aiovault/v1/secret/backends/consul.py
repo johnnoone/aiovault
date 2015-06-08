@@ -21,7 +21,7 @@ class ConsulBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/config/access' % self.name
+        path = self.path('config/access')
         scheme = None
         if address.startswith('https://'):
             scheme, address = 'https', address[8:]
@@ -44,7 +44,7 @@ class ConsulBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -64,7 +64,7 @@ class ConsulBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
         data = {'policy': base64_encode(policy)}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -80,7 +80,7 @@ class ConsulBackend(SecretBackend):
             bool
         """
         method = 'DELETE'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -95,7 +95,7 @@ class ConsulBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/creds/%s' % (self.name, name)
+        path = self.path('creds', name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()

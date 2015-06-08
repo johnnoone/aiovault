@@ -43,7 +43,7 @@ class TokenBackend:
             LoginToken: The client token
         """
         method = 'POST'
-        path = '/auth/%s/create' % self.name
+        path = self.path('create')
         data = {'id': id,
                 'policies': policies,
                 'metadata': metadata,
@@ -64,7 +64,7 @@ class TokenBackend:
             ReadToken: The current client token
         """
         method = 'GET'
-        path = '/auth/%s/lookup-self' % self.name
+        path = self.path('lookup-self')
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -81,7 +81,7 @@ class TokenBackend:
         """
         token = getattr(token, 'id', token)
         method = 'GET'
-        path = '/auth/%s/lookup/%s' % (self.name, token)
+        path = self.path('lookup', token)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -102,7 +102,7 @@ class TokenBackend:
         """
         token = getattr(token, 'id', token)
         method = 'POST'
-        path = '/auth/%s/revoke/%s' % (self.name, token)
+        path = self.path('revoke', token)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -121,7 +121,7 @@ class TokenBackend:
         """
         token = getattr(token, 'id', token)
         method = 'POST'
-        path = '/auth/%s/revoke-orphan/%s' % (self.name, token)
+        path = self.path('revoke-orphan', token)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -138,7 +138,7 @@ class TokenBackend:
             token (str): The token ID
         """
         method = 'POST'
-        path = '/auth/%s/revoke-prefix/%s' % (self.name, prefix)
+        path = self.path('revoke-prefix', prefix)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -159,7 +159,7 @@ class TokenBackend:
         """
         token = getattr(token, 'id', token)
         method = 'POST'
-        path = '/auth/%s/renew/%s' % (self.name, token)
+        path = self.path('renew', token)
         data = {'increment': increment}
 
         response = yield from self.req_handler(method, path, json=data)

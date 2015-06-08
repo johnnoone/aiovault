@@ -18,7 +18,7 @@ class TransitBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/keys/%s' % (self.name, name)
+        path = self.path('keys', name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -39,7 +39,7 @@ class TransitBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/keys/%s' % (self.name, name)
+        path = self.path('keys', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -57,7 +57,7 @@ class TransitBackend(SecretBackend):
             bool
         """
         method = 'DELETE'
-        path = '/%s/keys/%s' % (self.name, name)
+        path = self.path('keys', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -73,7 +73,7 @@ class TransitBackend(SecretBackend):
             Value
         """
         method = 'POST'
-        path = '/%s/encrypt/%s' % (self.name, key)
+        path = self.path('encrypt', key)
         data = {'plaintext': base64_encode(plaintext)}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -92,7 +92,7 @@ class TransitBackend(SecretBackend):
             Value
         """
         method = 'POST'
-        path = '/%s/decrypt/%s' % (self.name, key)
+        path = self.path('decrypt', key)
         data = {'ciphertext': ciphertext}
 
         response = yield from self.req_handler(method, path, json=data)

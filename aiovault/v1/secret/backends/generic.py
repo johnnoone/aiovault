@@ -23,7 +23,7 @@ class GenericBackend(SecretBackend):
             Value: The key value
         """
         method = 'GET'
-        path = '/%s/%s' % (self.name, key)
+        path = self.path(key)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -45,7 +45,7 @@ class GenericBackend(SecretBackend):
         if not isinstance(values, dict):
             raise ValueError('values must be a dict')
         method = 'POST'
-        path = '/%s/%s' % (self.name, key)
+        path = self.path(key)
         data = values
 
         response = yield from self.req_handler(method, path, json=data)
@@ -61,7 +61,7 @@ class GenericBackend(SecretBackend):
             bool: The key does not exists in storage
         """
         method = 'DELETE'
-        path = '/%s/%s' % (self.name, key)
+        path = self.path(key)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

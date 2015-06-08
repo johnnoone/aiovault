@@ -18,7 +18,7 @@ class LDAPBackend(AuthBackend):
             LoginToken
         """
         method = 'POST'
-        path = '/auth/%s/login/%s' % (self.name, username)
+        path = self.path('login', username)
         data = {'password': password}
 
         token = yield from authenticate(self.req_handler,
@@ -50,7 +50,7 @@ class LDAPBackend(AuthBackend):
             bool
         """
         method = 'POST'
-        path = '/auth/%s/config' % self.name
+        path = self.path('config')
         data = {'url': url,
                 'userattr': userattr,
                 'userdn': userdn,
@@ -69,7 +69,7 @@ class LDAPBackend(AuthBackend):
             Value
         """
         method = 'GET'
-        path = '/auth/%s/groups/%s' % (self.name, name)
+        path = self.path('groups', name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -93,7 +93,7 @@ class LDAPBackend(AuthBackend):
             bool
         """
         method = 'POST'
-        path = '/auth/%s/groups/%s' % (self.name, name)
+        path = self.path('groups', name)
         data = {'policies': format_policies(policies)}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -113,7 +113,7 @@ class LDAPBackend(AuthBackend):
             bool
         """
         method = 'DELETE'
-        path = '/auth/%s/groups/%s' % (self.name, name)
+        path = self.path('groups', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

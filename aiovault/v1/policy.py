@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.policy import Rules
-from aiovault.util import suppress, ok, task
+from aiovault.util import suppress, ok, task, Path
 
 
 class PolicyEndpoint:
@@ -11,7 +11,7 @@ class PolicyEndpoint:
 
     @property
     def path(self):
-        return '/sys/policy'
+        return Path('/sys/policy')
 
     @task
     def items(self):
@@ -38,7 +38,7 @@ class PolicyEndpoint:
         """
         name = getattr(name, 'name', name)
         method = 'GET'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -67,7 +67,7 @@ class PolicyEndpoint:
         name = getattr(name, 'name', name)
         rules = getattr(rules, 'rules', rules)
         method = 'PUT'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
         data = {'rules': json.dumps({'path': rules})}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -88,7 +88,7 @@ class PolicyEndpoint:
         """
         name = getattr(name, 'name', name)
         method = 'DELETE'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

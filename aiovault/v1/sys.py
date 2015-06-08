@@ -1,5 +1,5 @@
 from aiovault.objects import Status, Initial, HighAvailibility, Health
-from aiovault.util import task
+from aiovault.util import task, Path
 
 
 class SysEndpoint:
@@ -9,7 +9,7 @@ class SysEndpoint:
 
     @property
     def path(self):
-        return '/sys/init'
+        return Path('/sys/init')
 
     @task
     def status(self):

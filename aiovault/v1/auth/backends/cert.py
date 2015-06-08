@@ -23,7 +23,7 @@ class CertBackend(AuthBackend):
             LoginToken
         """
         method = 'POST'
-        path = '/auth/%s/login' % self.name
+        path = self.path(self.name)
         token = yield from authenticate(self.req_handler,
                                         method,
                                         path)
@@ -44,7 +44,7 @@ class CertBackend(AuthBackend):
             lease (str): Lease time in seconds. Defaults to 1 hour
         """
         method = 'POST'
-        path = '/auth/%s/certs/%s' % (self.name, name)
+        path = self.path('certs', name)
         data = {'policies': format_policies(policies),
                 'display_name': display_name,
                 'certificate': certificate,
@@ -61,7 +61,7 @@ class CertBackend(AuthBackend):
             name (str): The name of the certificate
         """
         method = 'GET'
-        path = '/auth/%s/certs/%s' % (self.name, name)
+        path = self.path('certs', name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
@@ -75,7 +75,7 @@ class CertBackend(AuthBackend):
             name (str): The name of the certificate
         """
         method = 'DELETE'
-        path = '/auth/%s/certs/%s' % (self.name, name)
+        path = self.path('certs', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

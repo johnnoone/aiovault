@@ -15,7 +15,7 @@ class GitHubBackend(AuthBackend):
             LoginToken
         """
         method = 'POST'
-        path = '/auth/%s/login' % self.name
+        path = self.path('login')
         data = {'token': github_token}
 
         token = yield from authenticate(self.req_handler,
@@ -35,7 +35,7 @@ class GitHubBackend(AuthBackend):
             bool
         """
         method = 'POST'
-        path = '/auth/%s/config' % self.name
+        path = self.path('config')
         data = {'organization': organization}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -52,7 +52,7 @@ class GitHubBackend(AuthBackend):
             bool
         """
         method = 'POST'
-        path = '/auth/%s/map/teams/%s' % (self.name, name)
+        path = self.path('map', 'teams', name)
         policies = format_policies(policies)
         data = {'value': policies}
 

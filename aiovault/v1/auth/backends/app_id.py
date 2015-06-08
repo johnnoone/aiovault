@@ -17,7 +17,7 @@ class AppIDBackend(AuthBackend):
             LoginToken: The client token
         """
         method = 'POST'
-        path = '/auth/%s/login' % self.name
+        path = self.path(self.name)
         data = {'app_id': app_id,
                 'user_id': user_id}
 
@@ -38,7 +38,7 @@ class AppIDBackend(AuthBackend):
         """
         app_id = getattr(app_id, 'id', app_id)
         method = 'GET'
-        path = '/auth/%s/map/app-id/%s' % (self.name, app_id)
+        path = self.path('map', 'app-id', app_id)
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
         return Value(**result)
@@ -56,7 +56,7 @@ class AppIDBackend(AuthBackend):
         """
         app_id = getattr(app_id, 'id', app_id)
         method = 'POST'
-        path = '/auth/%s/map/app-id/%s' % (self.name, app_id)
+        path = self.path('map', 'app-id', app_id)
         policies = format_policies(policies)
 
         data = {'display_name': display_name or app_id,
@@ -79,7 +79,7 @@ class AppIDBackend(AuthBackend):
         app_id = getattr(app_id, 'id', app_id)
         user = getattr(user, 'id', user)
         method = 'POST'
-        path = '/auth/%s/map/user-id/%s' % (self.name, user)
+        path = self.path('map', 'user-id', user)
         data = {'value': app_id,
                 'cidr_block': cidr_block}
 

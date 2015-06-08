@@ -50,7 +50,7 @@ class AWSBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/config/root' % self.name
+        path = self.path('config/root')
         data = {'access_key': access_key,
                 'secret_key': secret_key,
                 'region': region}
@@ -80,7 +80,7 @@ class AWSBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/config/lease' % self.name
+        path = self.path('config/lease')
         data = {'lease': format_duration(lease),
                 'lease_max': format_duration(lease_max)}
 
@@ -108,7 +108,7 @@ class AWSBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
         data = {'policy': policy}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -124,7 +124,7 @@ class AWSBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -143,7 +143,7 @@ class AWSBackend(SecretBackend):
             bool
         """
         method = 'DELETE'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -158,7 +158,7 @@ class AWSBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/creds/%s' % (self.name, name)
+        path = self.path('creds', name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()

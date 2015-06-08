@@ -18,7 +18,7 @@ class PostgreSQLBackend(SecretBackend):
                        e.g. "user=foo host=bar"
         """
         method = 'POST'
-        path = '/%s/config/connection' % self.name
+        path = self.path('config/connection')
         data = {'value': dsn}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -39,7 +39,7 @@ class PostgreSQLBackend(SecretBackend):
                              suffix.
         """
         method = 'POST'
-        path = '/%s/config/lease' % self.name
+        path = self.path('config/lease')
         data = {'lease': format_duration(lease),
                 'lease_max': format_duration(lease_max)}
 
@@ -54,7 +54,7 @@ class PostgreSQLBackend(SecretBackend):
             name (str): The role name
         """
         method = 'GET'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -74,7 +74,7 @@ class PostgreSQLBackend(SecretBackend):
                        substituted.
         """
         method = 'POST'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
         data = {'sql': sql}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -88,7 +88,7 @@ class PostgreSQLBackend(SecretBackend):
             name (str): The role name
         """
         method = 'DELETE'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -101,7 +101,7 @@ class PostgreSQLBackend(SecretBackend):
             name (str): The role name
         """
         method = 'GET'
-        path = '/%s/creds/%s' % (self.name, name)
+        path = self.path('creds', name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()

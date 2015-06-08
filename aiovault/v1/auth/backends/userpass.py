@@ -26,7 +26,7 @@ class UserPassBackend(AuthBackend):
             LoginToken
         """
         method = 'POST'
-        path = '/auth/%s/login/%s' % (self.name, username)
+        path = self.path('login', username)
         data = {'password': password}
 
         token = yield from authenticate(self.req_handler,
@@ -45,7 +45,7 @@ class UserPassBackend(AuthBackend):
             policies (str): The policies associated with the user
         """
         method = 'POST'
-        path = '/auth/%s/users/%s' % (self.name, username)
+        path = self.path('users', username)
         data = {'password': password,
                 'policies': policies}
 

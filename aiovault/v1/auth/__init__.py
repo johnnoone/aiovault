@@ -6,7 +6,7 @@
 
 from .backends import load_backend
 from collections.abc import Mapping
-from aiovault.util import ok, task
+from aiovault.util import ok, task, Path
 
 __all__ = ['authenticate', 'AuthEndpoint', 'AuthCollection']
 
@@ -18,7 +18,7 @@ class AuthEndpoint:
 
     @property
     def path(self):
-        return '/sys/auth'
+        return Path('/sys/auth')
 
     @task
     def items(self):
@@ -93,7 +93,7 @@ class AuthEndpoint:
             name (str): The name of mount
         """
         method = 'DELETE'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

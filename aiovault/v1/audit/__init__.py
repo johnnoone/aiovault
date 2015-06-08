@@ -1,5 +1,5 @@
 from .backends import load_backend
-from aiovault.util import ok, task
+from aiovault.util import ok, task, Path
 
 
 class AuditEndpoint:
@@ -15,7 +15,7 @@ class AuditEndpoint:
 
     @property
     def path(self):
-        return '/sys/audit'
+        return Path('/sys/audit')
 
     @task
     def enable(self, name, *, type=None, description=None, **options):
@@ -34,7 +34,7 @@ class AuditEndpoint:
         obj = load_backend(type, name, req_handler=self.req_handler)
         options = obj.validate(**options)
         method = 'PUT'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
         data = {'type': type,
                 'description': description,
                 'options': options}
@@ -51,7 +51,7 @@ class AuditEndpoint:
             bool
         """
         method = 'DELETE'
-        path = '%s/%s' % (self.path, name)
+        path = self.path(name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)

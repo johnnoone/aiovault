@@ -35,7 +35,7 @@ class MySQLBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/config/connection' % self.name
+        path = self.path('config/connection')
         data = {'value': dsn}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -58,7 +58,7 @@ class MySQLBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/config/lease' % self.name
+        path = self.path('config/lease')
         data = {'lease': format_duration(lease),
                 'lease_max': format_duration(lease_max)}
 
@@ -75,7 +75,7 @@ class MySQLBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         try:
             response = yield from self.req_handler(method, path)
@@ -117,7 +117,7 @@ class MySQLBackend(SecretBackend):
             bool
         """
         method = 'POST'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
         data = {'sql': sql}
 
         response = yield from self.req_handler(method, path, json=data)
@@ -133,7 +133,7 @@ class MySQLBackend(SecretBackend):
             bool
         """
         method = 'DELETE'
-        path = '/%s/roles/%s' % (self.name, name)
+        path = self.path('roles', name)
 
         response = yield from self.req_handler(method, path)
         return ok(response)
@@ -152,7 +152,7 @@ class MySQLBackend(SecretBackend):
             Value
         """
         method = 'GET'
-        path = '/%s/creds/%s' % (self.name, name)
+        path = self.path('creds', name)
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()

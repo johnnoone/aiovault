@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import os.path
 from base64 import b64decode, b64encode
 from datetime import timedelta
 from functools import partial, wraps
@@ -127,3 +128,12 @@ except ImportError:
             #
             # See http://bugs.python.org/issue12029 for more details
             return exctype is not None and issubclass(exctype, self._exceptions)  # noqa
+
+
+class Path(str):
+    """Poorsman path maker.
+    """
+
+    def __call__(self, *args):
+        obj = os.path.join(self, *args)
+        return Path(obj)
