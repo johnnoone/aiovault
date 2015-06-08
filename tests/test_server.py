@@ -1,5 +1,6 @@
 from aiovault import Vault, VaultCLI
 from conftest import async_test
+import pytest
 
 
 @async_test
@@ -10,6 +11,7 @@ def test_init_cli(server):
     cli.audit_file(path='/tmp/aiovault.log')
 
 
+@pytest.mark.xfail
 @async_test
 def test_init(server):
     client = Vault(server.addr, cert=[server.csr, server.key])
