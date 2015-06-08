@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import os.path
+import py.error
 import pytest
 import re
 import sys
@@ -19,11 +20,19 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
+def fail(msg, *args):
+    if args:
+        msg = msg % args
+    raise InvocationError(msg)
+
+
+class InvocationError(py.error.Error):
+    pass
+
+
 def async_test(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        # __tracebackhide__ = True
-
         coro = asyncio.coroutine(f)
         future = coro(*args, **kwargs)
         loop = asyncio.get_event_loop()
@@ -54,7 +63,7 @@ class Vault:
 
     def start(self):
         if self._proc:
-            raise Exception('Vault %s is already running' % self.name)
+            fail('Vault %s is already running', self.name)
 
         env = os.environ.copy()
         env.setdefault('GOMAXPROCS', '2')
@@ -70,8 +79,9 @@ class Vault:
 
         proc = Popen(args, stdout=PIPE, stderr=PIPE, env=env, shell=False)
         self._proc = proc
+        pid = proc.pid
 
-        logging.info('Starting %s [%s]' % (self.name, proc.pid))
+        logging.info('Starting %s [%s]', self.name, pid)
 
         buf = ''
         while 'Vault server started!' not in buf:
@@ -98,8 +108,11 @@ class Vault:
                     break
             sleep(1)
         else:
-            raise Exception('Unable to start %s [%s]' % (self.name, proc.pid))
-
+            fail('Unable to start %s [%s]', self.name, pid)
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            fail('Failed to keep %s [%s] running', self.name, pid)
         data.update({
             'sealed': extract(buf, 'Sealed: (\w+)') == 'true',
             'shares': int(extract(buf, 'Key Shares: (\d+)')),
@@ -110,15 +123,11 @@ class Vault:
 
         self._data = Namespace()
         self._data.update(data)
-        logging.info('Vault %s [%s] is ready to rock %s',
-                     self.name,
-                     proc.pid,
-                     data)
+        logging.info('Vault %s [%s] is ready to rock %s', self.name, pid, data)
 
     def stop(self):
         if not self._proc:
-            raise Exception('Node %s is not running' % self.name)
-        logging.info('Halt %s [%s]' % (self.name, self._proc.pid))
+            fail('Vault %s is not running', self.name)
         result = self._proc.terminate()
         self._proc = None
         return result
@@ -140,7 +149,7 @@ class VaultTLS:
 
     def start(self):
         if self._proc:
-            raise Exception('Vault %s is already running' % self.name)
+            fail('Vault %s is already running', self.name)
 
         with open(self.server_config) as file:
             configuration = json.load(file)['listener']['tcp']
@@ -176,25 +185,23 @@ class VaultTLS:
                      shell=False,
                      cwd=cwd)
         self._proc = proc
+        pid = proc.pid
 
-        logging.info('Starting %s [%s]' % (self.name, proc.pid))
+        logging.info('Starting %s [%s]', self.name, pid)
 
         buf = ''
         while 'Vault server started!' not in buf:
             buf += proc.stdout.read(1).decode('utf-8')
         logging.debug(buf)
-
-        sleep(2)
-
-        logging.info('Vault %s [%s] is ready to rock %s',
-                     self.name,
-                     proc.pid,
-                     data)
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            fail('Failed to keep %s [%s] running', self.name, pid)
+        logging.info('Vault %s [%s] is ready to rock %s', self.name, pid, data)
 
     def stop(self):
         if not self._proc:
-            raise Exception('Node %s is not running' % self.name)
-        logging.info('Halt %s [%s]' % (self.name, self._proc.pid))
+            fail('Node %s is not running', self.name)
         result = self._proc.terminate()
         self._proc = None
         return result
@@ -222,7 +229,7 @@ class Consul(object):
 
     def start(self):
         if self._proc:
-            raise Exception('Node %s is already running' % self.name)
+            fail('Node %s is already running', self.name)
 
         # reset tmp store
         Popen(['rm', '-rf', self.config.data_dir]).communicate()
@@ -232,7 +239,8 @@ class Consul(object):
         proc = Popen(['consul', 'agent', '-config-file=%s' % self.config_file],
                      stdout=PIPE, stderr=PIPE, env=env, shell=False)
         self._proc = proc
-        logging.info('Starting %s [%s]' % (self.name, proc.pid))
+        pid = proc.pid
+        logging.info('Starting %s [%s]' % (self.name, pid))
         for i in range(60):
             with Popen(['consul', 'info'], stdout=PIPE, stderr=PIPE) as sub:
                 stdout, stderr = sub.communicate(timeout=5)
@@ -246,13 +254,16 @@ class Consul(object):
                     break
             sleep(1)
         else:
-            raise Exception('Unable to start %s [%s]' % (self.name, proc.pid))
-        logging.info('Node %s [%s] is ready to rock' % (self.name, proc.pid))
+            fail('Unable to start %s [%s]', self.name, pid)
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            fail('Failed to keep %s [%s] running', self.name, pid)
+        logging.info('Consul %s [%s] is ready to rock', self.name, pid)
 
     def stop(self):
         if not self._proc:
-            raise Exception('Node %s is not running' % self.name)
-        logging.info('Halt %s [%s]' % (self.name, self._proc.pid))
+            fail('Node %s is not running', self.name)
         result = self._proc.terminate()
         self._proc = None
         return result
