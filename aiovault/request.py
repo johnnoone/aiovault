@@ -10,7 +10,7 @@ from aiohttp import ClientSession, TCPConnector
 
 class Request:
 
-    def __init__(self, addr, version, token=None, cert=None):
+    def __init__(self, addr, version, token=None, cert=None, verify=True):
         self.addr = addr
         self.version = version
         self._token = token
@@ -19,31 +19,34 @@ class Request:
         if self._token:
             cookies.setdefault('token', self._token)
 
-        connector = None
-        use_ssl = addr.startswith('https://') or cert
-        if use_ssl:
-            logging.info('use ssl context')
-            if addr.startswith('http://'):
-                n = 'https://%s' % addr[7:]
-                logging.warn('exchanged %r to %r', addr, n)
-                self.addr = n
+        connector, context, ca = None, None, None
+        if verify:
+            if isinstance(verify, str):
+                verify, ca = True, verify
+        else:
+            verify = False
 
+        if addr.startswith('https://') or cert:
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
             context.options |= ssl.OP_NO_SSLv2
             context.options |= ssl.OP_NO_SSLv3
             if cert:
-                try:
-                    certfile, keyfile, cafile = cert
-                    context.verify_mode = ssl.CERT_REQUIRED
-                    context.load_cert_chain(certfile, keyfile)
-                    if os.path.isdir(cafile):
-                        context.load_verify_locations(capath=cafile)
-                    else:
-                        context.load_verify_locations(cafile=cafile)
-                except ValueError:
-                    context.verify_mode = ssl.CERT_NONE
-                    context.load_cert_chain(*cert)
+                certfile, keyfile = cert
+                context.load_cert_chain(certfile, keyfile)
+
+            if ca:
+                context.verify_mode = ssl.CERT_REQUIRED
+                if os.path.isdir(ca):
+                    context.load_verify_locations(capath=ca)
+                else:
+                    context.load_verify_locations(cafile=ca)
+            else:
+                context.verify_mode = ssl.CERT_NONE
+
+        if verify:
             connector = TCPConnector(verify_ssl=True, ssl_context=context)
+        else:
+            connector = TCPConnector(verify_ssl=False)
 
         self.session = ClientSession(cookies=cookies, connector=connector)
 

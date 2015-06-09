@@ -5,9 +5,10 @@ from .util import task, extract_id
 
 class Vault(v1.SysEndpoint):
 
-    def __init__(self, addr, token=None, cert=None):
+    def __init__(self, addr, token=None, cert=None, verify=True):
         token = extract_id(token)
-        self.req_handler = Request(addr, 'v1', token=token, cert=cert)
+        self.req_handler = Request(addr, 'v1', token=token,
+                                   cert=cert, verify=verify)
 
     @property
     def audit(self):

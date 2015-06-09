@@ -34,7 +34,7 @@ def test_cert(server, env):
     # TODO does not work with Vault v0.1.2
     # return
 
-    client = Vault(server.addr, cert=[crt_file, key_file, ca_path])
+    client = Vault(server.addr, cert=[crt_file, key_file], verify=crt_file)
     backend = client.auth.load('cert')
     res = yield from backend.login()
     print(res)
