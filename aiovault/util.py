@@ -137,3 +137,11 @@ class Path(str):
     def __call__(self, *args):
         obj = os.path.join(self, *args)
         return Path(obj)
+
+
+def extract_id(obj):
+    return getattr(obj, 'id', obj)
+
+
+def extract_name(obj):
+    return getattr(obj, 'name', obj)

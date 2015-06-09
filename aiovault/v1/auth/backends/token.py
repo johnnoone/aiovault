@@ -1,6 +1,6 @@
 from aiovault.exceptions import InvalidPath
 from aiovault.token import ReadToken, LoginToken
-from aiovault.util import format_duration, ok, task, Path
+from aiovault.util import format_duration, ok, task, Path, extract_id
 
 
 class TokenBackend:
@@ -83,7 +83,7 @@ class TokenBackend:
         Returns:
             ReadToken: The client token
         """
-        token = getattr(token, 'id', token)
+        token = extract_id(token)
         method = 'GET'
         path = self.path('lookup', token)
 
@@ -104,7 +104,7 @@ class TokenBackend:
         Parameters:
             token (str): The token ID
         """
-        token = getattr(token, 'id', token)
+        token = extract_id(token)
         method = 'POST'
         path = self.path('revoke', token)
 
@@ -123,7 +123,7 @@ class TokenBackend:
         Parameters:
             token (str): The token ID
         """
-        token = getattr(token, 'id', token)
+        token = extract_id(token)
         method = 'POST'
         path = self.path('revoke-orphan', token)
 
@@ -161,7 +161,7 @@ class TokenBackend:
         Returns:
             LoginToken: The client token
         """
-        token = getattr(token, 'id', token)
+        token = extract_id(token)
         method = 'POST'
         path = self.path('renew', token)
         data = {'increment': increment}

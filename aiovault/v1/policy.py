@@ -1,7 +1,7 @@
 import json
 from aiovault.exceptions import InvalidPath
 from aiovault.policy import Rules
-from aiovault.util import suppress, ok, task, Path
+from aiovault.util import suppress, ok, task, Path, extract_name
 
 
 class PolicyEndpoint:
@@ -36,7 +36,7 @@ class PolicyEndpoint:
         Returns:
             Rules: The rules
         """
-        name = getattr(name, 'name', name)
+        name = extract_name(name)
         method = 'GET'
         path = self.path(name)
 
@@ -64,7 +64,7 @@ class PolicyEndpoint:
         Returns:
             bool: Rules has been written
         """
-        name = getattr(name, 'name', name)
+        name = extract_name(name)
         rules = getattr(rules, 'rules', rules)
         method = 'PUT'
         path = self.path(name)
@@ -86,7 +86,7 @@ class PolicyEndpoint:
         Returns:
             bool: Policy does not exists in storage
         """
-        name = getattr(name, 'name', name)
+        name = extract_name(name)
         method = 'DELETE'
         path = self.path(name)
 

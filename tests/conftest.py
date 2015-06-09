@@ -10,7 +10,7 @@ import re
 import sys
 from collections.abc import Mapping
 from functools import wraps
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 from time import sleep
 
 __tracebackhide__ = True

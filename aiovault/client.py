@@ -1,12 +1,12 @@
 from . import v1
 from .request import Request
-from .util import task
+from .util import task, extract_id
 
 
 class Vault(v1.SysEndpoint):
 
     def __init__(self, addr, token=None, cert=None):
-        token = getattr(token, 'id', token)
+        token = extract_id(token)
         self.req_handler = Request(addr, 'v1', token=token, cert=cert)
 
     @property

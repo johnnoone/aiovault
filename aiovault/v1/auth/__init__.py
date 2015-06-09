@@ -6,7 +6,7 @@
 
 from .backends import load_backend
 from collections.abc import Mapping
-from aiovault.util import ok, task, Path
+from aiovault.util import ok, task, Path, extract_name
 
 __all__ = ['authenticate', 'AuthEndpoint', 'AuthCollection']
 
@@ -43,7 +43,7 @@ class AuthEndpoint:
             AuthBackend
         """
         type = type or getattr(name, 'type', name)
-        name = getattr(name, 'name', name)
+        name = extract_name(name)
 
         return load_backend(type, {
             'name': name,

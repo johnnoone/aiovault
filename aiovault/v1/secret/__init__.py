@@ -8,7 +8,7 @@ import logging
 from .backends import load_backend
 from collections.abc import Mapping
 from aiovault.exceptions import InternalServerError
-from aiovault.util import ok, task, Path
+from aiovault.util import ok, task, Path, extract_name
 
 __all__ = ['SecretEndpoint', 'SecretCollection']
 
@@ -65,7 +65,7 @@ class SecretEndpoint:
             SecretBackend
         """
         type = type or getattr(name, 'type', name)
-        name = getattr(name, 'name', name)
+        name = extract_name(name)
         return load_backend(type, {
             'name': name,
             'type': type,
@@ -100,7 +100,7 @@ class SecretEndpoint:
         Returns:
             bool
         """
-        name = getattr(name, 'name', name)
+        name = extract_name(name)
         method = 'DELETE'
         path = self.path(name)
 
@@ -120,8 +120,8 @@ class SecretEndpoint:
         Returns:
             bool
         """
-        src = getattr(src, 'name', src)
-        dest = getattr(dest, 'name', dest)
+        src = extract_name(src)
+        dest = extract_name(dest)
         method = 'POST'
         path = '/sys/remount'
         data = {'from': src,

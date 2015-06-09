@@ -1,25 +1,27 @@
 from .bases import AuthBackend
 from aiovault.objects import Value
 from aiovault.token import authenticate
-from aiovault.util import format_policies, ok, task
+from aiovault.util import format_policies, ok, task, extract_id, extract_name
 
 
 class AppIDBackend(AuthBackend):
 
     @task
-    def login(self, *, app_id, user_id):
+    def login(self, *, app, user):
         """Returns information about the current client token.
 
         Parameters:
-            app_id (str): The app id
-            user_id (str): The user id
+            app (str): The application ID
+            user (str): The user name
         Returns:
             LoginToken: The client token
         """
         method = 'POST'
-        path = self.path(self.name)
-        data = {'app_id': app_id,
-                'user_id': user_id}
+        path = self.path('login')
+        app = extract_id(app)
+        user = extract_name(user)
+        data = {'app_id': app,
+                'user_id': user}
 
         token = yield from authenticate(self.req_handler,
                                         method,
@@ -28,59 +30,59 @@ class AppIDBackend(AuthBackend):
         return token
 
     @task
-    def read_app(self, app_id):
+    def read_app(self, app):
         """Read app.
 
         Parameters:
-            app_id (str): The application ID
+            app (str): The application ID
         Returns:
             Value
         """
-        app_id = getattr(app_id, 'id', app_id)
+        app = extract_id(app)
         method = 'GET'
-        path = self.path('map', 'app-id', app_id)
+        path = self.path('map', 'app-id', app)
         response = yield from self.req_handler(method, path)
         result = yield from response.json()
         return Value(**result)
 
     @task
-    def write_app(self, app_id, *, policies=None, display_name=None):
+    def write_app(self, app, *, policies=None, display_name=None):
         """Write app.
 
         Parameters:
-            app_id (str): The application ID
+            app (str): The application ID
             policies (str): The policies
             display_name (str): The name to be displayed
         Returns:
             bool
         """
-        app_id = getattr(app_id, 'id', app_id)
+        app = extract_id(app)
         method = 'POST'
-        path = self.path('map', 'app-id', app_id)
+        path = self.path('map', 'app-id', app)
         policies = format_policies(policies)
 
-        data = {'display_name': display_name or app_id,
+        data = {'display_name': display_name or app,
                 'value': policies}
 
         response = yield from self.req_handler(method, path, json=data)
         return ok(response)
 
     @task
-    def write_user(self, user, app_id, cidr_block=None):
+    def write_user(self, user, app, cidr_block=None):
         """Write user.
 
         Parameters:
             user (str): The user name
-            app_id (str): The application ID
+            app (str): The application ID
             cidr_block (str): The CIDR block to limit
         Returns:
             bool
         """
-        app_id = getattr(app_id, 'id', app_id)
-        user = getattr(user, 'id', user)
+        app = extract_id(app)
+        user = extract_name(user)
         method = 'POST'
         path = self.path('map', 'user-id', user)
-        data = {'value': app_id,
+        data = {'value': app,
                 'cidr_block': cidr_block}
 
         response = yield from self.req_handler(method, path, json=data)

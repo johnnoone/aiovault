@@ -23,7 +23,7 @@ class CertBackend(AuthBackend):
             LoginToken
         """
         method = 'POST'
-        path = self.path(self.name)
+        path = self.path('login')
         token = yield from authenticate(self.req_handler,
                                         method,
                                         path)

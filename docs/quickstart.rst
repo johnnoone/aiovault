@@ -41,7 +41,7 @@ For example, the ``app-id`` backend::
     # on the server side
     backend = yield from root.auth.enable('app-id')
     yield from backend.write_app(APP, policies=['dummy'])
-    yield from backend.write_user(USER, app_id=APP)
+    yield from backend.write_user(USER, app=APP)
 
 And then, on the client side, you will be able to login with these new
 credentials::
@@ -49,7 +49,7 @@ credentials::
     # on the client side
     client = Vault()
     backend = client.auth.load('app-id')
-    result = yield from backend.login(app_id=APP, user_id=USER)
+    result = yield from backend.login(app=APP, user=USER)
 
 
 Configuring secret backends

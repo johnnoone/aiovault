@@ -15,7 +15,7 @@ def test_appid(dev_server):
     app = yield from backend.read_app('foo')
     assert app['key'] == 'foo'
 
-    created = yield from backend.write_user('bar', app_id='foo')
+    created = yield from backend.write_user('bar', app='foo')
     assert created
 
     # do login
@@ -23,7 +23,7 @@ def test_appid(dev_server):
 
     # login
     backend = client.auth.load('app-id')
-    result = yield from backend.login(app_id='foo', user_id='bar')
+    result = yield from backend.login(app='foo', user='bar')
     assert result['policies'] == ['dummy']
 
 

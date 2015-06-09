@@ -1,6 +1,6 @@
 from abc import ABCMeta
 from aiovault.exceptions import HTTPError, MountError
-from aiovault.util import ok, task, Path
+from aiovault.util import ok, task, Path, extract_name
 
 
 class SecretBackend(metaclass=ABCMeta):
@@ -59,7 +59,7 @@ class SecretBackend(metaclass=ABCMeta):
         Parameters:
             dest (str): The new endpoint
         """
-        dest = getattr(dest, 'name', dest)
+        dest = extract_name(dest)
         method = 'POST'
         path = '/sys/remount'
         data = {'from': self.name,
