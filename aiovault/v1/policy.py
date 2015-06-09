@@ -107,7 +107,7 @@ class PolicyEndpoint:
         try:
             rules = yield from self.read(name)
         except KeyError:
-            rules = Rules(name)
+            rules = Rules(name=name)
 
         if hasattr(path, 'path'):
             path = path.path

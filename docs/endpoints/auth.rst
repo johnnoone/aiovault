@@ -37,7 +37,7 @@ Backends
 Objects
 -------
 
-.. autoclass:: aiovault.WrittenToken
+.. autoclass:: aiovault.LoginToken
    :members:
 
 .. autoclass:: aiovault.ReadToken

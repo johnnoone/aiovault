@@ -9,5 +9,5 @@ Policy
 Objects
 -------
 
-.. autoclass:: aiovault.Policy
+.. autoclass:: aiovault.Rules
    :members:
