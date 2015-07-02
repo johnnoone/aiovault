@@ -7,8 +7,7 @@ import pytest
 def test_lookup_1(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    token = yield from backend.lookup_self()
+    token = yield from client.auth.lookup_self()
     assert token.id == dev_server.root_token
 
 
@@ -16,8 +15,7 @@ def test_lookup_1(dev_server):
 def test_lookup_2(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    token = yield from backend.lookup(dev_server.root_token)
+    token = yield from client.auth.lookup(dev_server.root_token)
     assert token.id == dev_server.root_token
 
 
@@ -25,9 +23,8 @@ def test_lookup_2(dev_server):
 def test_lookup_3(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    token1 = yield from backend.create()
-    token2 = yield from backend.lookup(token1.id)
+    token1 = yield from client.auth.create()
+    token2 = yield from client.auth.lookup(token1.id)
     assert token2.id == token1.id
 
 
@@ -35,61 +32,55 @@ def test_lookup_3(dev_server):
 def test_renew(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    token = yield from backend.create(lease='1h')
-    token = yield from backend.renew(token)
+    token = yield from client.auth.create(lease='1h')
+    token = yield from client.auth.renew(token)
 
 
 @async_test
 def test_revoke_prefix(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    token = yield from backend.create()
-    yield from backend.lookup(token)
-    revoked = yield from backend.revoke_prefix('auth/token/')
+    token = yield from client.auth.create()
+    yield from client.auth.lookup(token)
+    revoked = yield from client.auth.revoke_prefix('auth/token/')
     assert revoked is True
 
     with pytest.raises(KeyError):
-        yield from backend.lookup(token)
+        yield from client.auth.lookup(token)
 
 
 @async_test
 def test_revoke_cascade(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    parent_token = yield from backend.create()
+    parent_token = yield from client.auth.create()
 
     client_b = Vault(dev_server.addr, token=parent_token)
-    backend_b = client_b.auth.load('token')
-    child_token = yield from backend_b.create()
+    child_token = yield from client_b.auth.create()
 
-    yield from backend.lookup(parent_token)
-    yield from backend.lookup(child_token)
+    yield from client.auth.lookup(parent_token)
+    yield from client.auth.lookup(child_token)
 
-    yield from backend.revoke(parent_token)
+    yield from client.auth.revoke(parent_token)
     with pytest.raises(KeyError):
-        yield from backend.lookup(parent_token)
+        yield from client.auth.lookup(parent_token)
     with pytest.raises(KeyError):
-        yield from backend.lookup(child_token)
+        yield from client.auth.lookup(child_token)
 
 
 @async_test
 def test_revoke_orphan(dev_server):
     client = Vault(dev_server.addr, token=dev_server.root_token)
 
-    backend = client.auth.load('token')
-    parent_token = yield from backend.create()
+    parent_token = yield from client.auth.create()
 
     client_b = Vault(dev_server.addr, token=parent_token)
-    backend_b = client_b.auth.load('token')
-    child_token = yield from backend_b.create()
+    child_token = yield from client_b.auth.create()
 
-    yield from backend.lookup(parent_token)
-    yield from backend.lookup(child_token)
+    yield from client.auth.lookup(parent_token)
+    yield from client.auth.lookup(child_token)
 
-    yield from backend.revoke_orphan(parent_token)
+    yield from client.auth.revoke_orphan(parent_token)
     with pytest.raises(KeyError):
-        yield from backend.lookup(parent_token)
-    yield from backend.lookup(child_token)
+        yield from client.auth.lookup(parent_token)
+    yield from client.auth.lookup(child_token)

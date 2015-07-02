@@ -3,12 +3,6 @@ from aiovault.util import ok, task, Path
 
 
 class AuditEndpoint:
-    """
-    Audit backends are the components in Vault that keep a detailed log of
-    all requests and response to Vault.
-    Because every operation with Vault is an API request/response, the audit
-    log contains every interaction with Vault, including errors.
-    """
 
     def __init__(self, req_handler):
         self.req_handler = req_handler

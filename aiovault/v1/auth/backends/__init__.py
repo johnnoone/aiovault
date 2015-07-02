@@ -8,12 +8,11 @@ from .app_id import AppIDBackend
 from .cert import CertBackend
 from .github import GitHubBackend
 from .ldap import LDAPBackend
-from .token import TokenBackend
 from .userpass import UserPassBackend
 from stevedore import DriverManager
 
 __all__ = ['AppIDBackend', 'CertBackend', 'GitHubBackend',
-           'LDAPBackend', 'TokenBackend', 'UserPassBackend']
+           'LDAPBackend', 'UserPassBackend']
 
 
 def load_backend(type, backend):
