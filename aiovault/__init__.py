@@ -9,4 +9,4 @@ from .token import ReadToken, LoginToken
 __all__ = ['Health', 'HighAvailibility', 'Initial', 'LoginError',
            'LoginToken', 'MountError', 'Rules', 'ReadToken',
            'SealStatus', 'Status', 'Value', 'Vault', 'VaultCLI']
-__version__ = '0.1'
+__version__ = '0.2.0rc1'

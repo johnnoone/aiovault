@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='aiovault',
-    version='0.1',
+    version='0.2.0rc1',
     description='Vault wrapper for asyncio',
     long_description=content,
     author='Xavier Barbosa',

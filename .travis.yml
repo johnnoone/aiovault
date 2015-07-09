@@ -17,8 +17,8 @@ install:
   - python setup.py develop
   - wget https://dl.bintray.com/mitchellh/consul/0.5.2_linux_amd64.zip
   - unzip 0.5.2_linux_amd64.zip
-  - wget https://dl.bintray.com/mitchellh/vault/vault_0.1.2_linux_amd64.zip
-  - unzip vault_0.1.2_linux_amd64.zip
+  - wget https://github.com/hashicorp/vault/releases/download/v0.2.0.rc1/linux_amd64.zip
+  - unzip linux_amd64.zip
 before_script:
   - export PATH=$PATH:$PWD
   - python tests/tls.py --directory certs --name server tls
