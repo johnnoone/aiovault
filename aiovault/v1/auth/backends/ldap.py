@@ -87,7 +87,7 @@ class LDAPBackend(AuthBackend):
 
         Parameters:
             name (str): Name of the LDAP group
-            policies (str): Comma-separated list of policies associated
+            policies (list): Comma-separated list of policies associated
                             to the group
         Returns:
             bool

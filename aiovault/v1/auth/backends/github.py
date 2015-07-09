@@ -47,7 +47,7 @@ class GitHubBackend(AuthBackend):
 
         Parameters:
             name (str): The team name
-            policies (str): The team policies
+            policies (list): The team policies
         Returns:
             bool
         """

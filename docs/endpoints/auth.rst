@@ -18,7 +18,7 @@ Enabling and configuring app-id backend::
 
     backend = yield from client.auth.enable('app-id')
     yield from backend.write_app(APP, policies=POLICIES)
-    yield from backend.write_user(USER, app=APp)
+    yield from backend.write_user(USER, app=APP)
 
 Login with app-id::
 
@@ -31,7 +31,9 @@ Enabling and configuring cert backend::
     POLICIES = ['dummy']
 
     backend = yield from client.auth.enable('cert')
-    yield from backend.write_cert(NAME, certificate=CSR_CERT, policies=POLICIES)
+    yield from backend.write_cert(NAME,
+                                  certificate=CSR_CERT,
+                                  policies=POLICIES)
 
 Login with cert::
 
@@ -73,7 +75,9 @@ Login with ldap::
     USER = 'tesla'
     PASSWORD = 'password'
 
-    token = yield from client.login('ldap', username=USER, password=PASSWORD)
+    token = yield from client.login('ldap',
+                                    username=USER,
+                                    password=PASSWORD)
 
 Enabling and configuring userpass backend::
 

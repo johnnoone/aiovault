@@ -19,7 +19,7 @@ def test_userpass(dev_server):
     assert result['auth']['metadata'] == {'username': 'mitchellh'}
 
     # nicer login
-    token = yield from client.auth.login('userpass',
+    token = yield from client.login('userpass',
                                          username='mitchellh',
                                          password='foo')
     assert token['metadata'] == {'username': 'mitchellh'}

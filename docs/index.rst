@@ -3,19 +3,11 @@ AIOVault
 
 AIOConsul is a Python >= 3.3 library for requesting vault_ API, build on top of asyncio_ and aiohttp_.
 
-Currently, this library aims a full compatibility with vault 0.1.
+Currently, this library aims a full compatibility with vault 0.1.2.
 
 
-Installation
-------------
-
-::
-
-    pip install aiovault
-
-
-Tutorial
---------
+Quickstart
+----------
 
 Many core ideas & API calls are explained in the tutorial/getting-started
 document:
@@ -26,20 +18,12 @@ document:
     quickstart
 
 
-Design
-------
-
-
-Focus
------
-
-
-Endpoints
----------
+Going deeper
+------------
 
 .. toctree::
-   :glob:
    :maxdepth: 1
+   :glob:
 
    endpoints/*
 

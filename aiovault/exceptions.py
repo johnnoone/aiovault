@@ -70,3 +70,8 @@ class LoginError(InvalidRequest):
 class MountError(Exception):
     """Raised when mount failed
     """
+
+
+class BadToken(InvalidRequest):
+    """Raised when token is bad
+    """

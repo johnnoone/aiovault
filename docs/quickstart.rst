@@ -4,6 +4,14 @@ Quickstart
 This document will try to present the most of the AIOVault's feature in on place.
 
 
+Installation
+------------
+
+::
+
+    $ pip install aiovault
+
+
 Initializing the Server
 -----------------------
 
@@ -48,8 +56,7 @@ credentials::
 
     # on the client side
     client = Vault()
-    backend = client.auth.load('app-id')
-    result = yield from backend.login(app=APP, user=USER)
+    result = yield from client.auth.login('app-id', app=APP, user=USER)
 
 
 Configuring secret backends

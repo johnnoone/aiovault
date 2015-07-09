@@ -42,7 +42,7 @@ class UserPassBackend(AuthBackend):
         Parameters:
             username (str): The username
             password (str): The password
-            policies (str): The policies associated with the user
+            policies (list): The policies associated with the user
         """
         method = 'POST'
         path = self.path('users', username)

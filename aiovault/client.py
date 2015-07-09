@@ -39,6 +39,10 @@ class Vault(v1.SysEndpoint):
         return v1.SecretEndpoint(self.req_handler)
 
     @task
+    def login(self, *args, **kwargs):
+        return self.auth.login(*args, **kwargs)
+
+    @task
     def read(self, path, **kwargs):
         method = kwargs.pop('method', 'GET')
         response = yield from self.req_handler(method, path, **kwargs)

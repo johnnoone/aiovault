@@ -40,7 +40,7 @@ class CertBackend(AuthBackend):
                                Must be x509 PEM encoded
             display_name (str): The display name to use for clients using this
                                 certificate
-            policies (str): Comma-separated list of policies
+            policies (list): The policies
             lease (str): Lease time in seconds. Defaults to 1 hour
         """
         method = 'POST'

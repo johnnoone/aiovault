@@ -51,7 +51,7 @@ class AppIDBackend(AuthBackend):
 
         Parameters:
             app (str): The application ID
-            policies (str): The policies
+            policies (list): The policies
             display_name (str): The name to be displayed
         Returns:
             bool

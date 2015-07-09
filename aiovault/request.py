@@ -1,10 +1,10 @@
 import asyncio
 import json
-import logging
 import os.path
 import ssl
-from .exceptions import DownError, HTTPError, InvalidRequest, InvalidPath
-from .exceptions import InternalServerError, RateLimitExceeded, Unauthorized
+from .exceptions import BadToken, DownError, HTTPError, InvalidRequest
+from .exceptions import InvalidPath, InternalServerError, RateLimitExceeded
+from .exceptions import Unauthorized
 from aiohttp import ClientSession, TCPConnector
 
 
@@ -87,6 +87,8 @@ class Request:
             raise InvalidRequest(data)
         if response.status == 401:
             raise Unauthorized(data)
+        if response.status == 403:
+            raise BadToken(data)
         if response.status == 404:
             raise InvalidPath(data)
         if response.status == 429:

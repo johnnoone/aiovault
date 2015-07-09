@@ -6,7 +6,7 @@
 
 from .backends import load_backend
 from collections.abc import Mapping
-from aiovault.exceptions import InvalidPath
+from aiovault.exceptions import BadToken, InvalidPath
 from aiovault.token import ReadToken, LoginToken
 from aiovault.util import extract_name, extract_id
 from aiovault.util import ok, task, Path, format_duration
@@ -120,8 +120,8 @@ class AuthEndpoint:
                              subset of the policies belonging to the token
                              making the request, unless root. If not specified,
                              defaults to all the policies of the calling token.
-            metadata (dict) A map of string to string valued metadata.
-                            This is passed through to the audit backends.
+            metadata (dict): A map of string to string valued metadata.
+                             This is passed through to the audit backends.
             no_parent (bool): If true and set by a root caller, the token will
                               not have the parent token of the caller. This
                               creates a token with no parent.
@@ -181,7 +181,7 @@ class AuthEndpoint:
             response = yield from self.req_handler(method, path)
             result = yield from response.json()
             return ReadToken(**result)
-        except InvalidPath:
+        except (InvalidPath, BadToken):
             raise KeyError('%r does not exists' % token)
 
     @task
