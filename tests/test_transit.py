@@ -19,7 +19,6 @@ def test_basic(dev_server):
     assert policy['name'] == 'test'
     assert policy['derived'] is False
 
-
     policy = yield from backend.read_raw('test')
     assert policy['name'] == 'test'
     assert policy['derived'] is False
@@ -82,7 +81,6 @@ def test_derived(dev_server):
     policy = yield from backend.read_key('test')
     assert policy['name'] == 'test'
     assert policy['derived'] is True
-
 
     policy = yield from backend.read_raw('test')
     assert policy['name'] == 'test'

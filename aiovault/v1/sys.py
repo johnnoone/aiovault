@@ -71,7 +71,7 @@ class SysEndpoint:
         return HighAvailibility(**result)
 
     @task
-    def health(self):
+    def health(self, *, standbyok=False):
         """Returns the health status of Vault.
 
         This matches the semantics of a Consul HTTP health check and
@@ -82,6 +82,8 @@ class SysEndpoint:
         """
         method = 'GET'
         path = '/sys/health'
+        if standbyok:
+            path += '?standbyok'
 
         response = yield from self.req_handler(method, path)
         result = yield from response.json()

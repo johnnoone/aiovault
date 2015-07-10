@@ -64,7 +64,9 @@ def test_lease(dev_server, consul):
                                                 token=consul.acl_master_token)
     assert configured
 
-    configured = yield from store.write_role('foo', policy=CONSUL_POLICY, lease='6h')
+    configured = yield from store.write_role('foo',
+                                             policy=CONSUL_POLICY,
+                                             lease='6h')
     assert configured
 
     role = yield from store.read_role('foo')
