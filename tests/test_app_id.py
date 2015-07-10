@@ -18,13 +18,22 @@ def test_appid(dev_server):
     created = yield from backend.write_user('bar', app='foo')
     assert created
 
+    user = yield from backend.read_user('bar')
+    assert user['key'] == 'bar'
+
     # do login
     client = Vault(dev_server.addr)
 
     # login
-    backend = client.auth.load('app-id')
-    result = yield from backend.login(app='foo', user='bar')
+    backend2 = client.auth.load('app-id')
+    result = yield from backend2.login(app='foo', user='bar')
     assert result['policies'] == ['dummy']
+
+    deleted = yield from backend.delete_user('bar')
+    assert deleted
+
+    deleted = yield from backend.delete_app('foo')
+    assert deleted
 
 
 @async_test

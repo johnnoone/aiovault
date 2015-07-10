@@ -68,6 +68,37 @@ class AppIDBackend(AuthBackend):
         return ok(response)
 
     @task
+    def delete_app(self, app):
+        """Delete app.
+
+        Parameters:
+            app (str): The application ID
+        Returns:
+            bool
+        """
+        app = extract_id(app)
+        method = 'DELETE'
+        path = self.path('map', 'app-id', app)
+        response = yield from self.req_handler(method, path)
+        return ok(response)
+
+    @task
+    def read_user(self, user):
+        """Read user.
+
+        Parameters:
+            user (str): The user name
+        Returns:
+            Value
+        """
+        user = extract_id(user)
+        method = 'GET'
+        path = self.path('map', 'user-id', user)
+        response = yield from self.req_handler(method, path)
+        result = yield from response.json()
+        return Value(**result)
+
+    @task
     def write_user(self, user, app, cidr_block=None):
         """Write user.
 
@@ -86,4 +117,19 @@ class AppIDBackend(AuthBackend):
                 'cidr_block': cidr_block}
 
         response = yield from self.req_handler(method, path, json=data)
+        return ok(response)
+
+    @task
+    def delete_user(self, user):
+        """Delete user.
+
+        Parameters:
+            user (str): The user name
+        Returns:
+            bool
+        """
+        user = extract_id(user)
+        method = 'DELETE'
+        path = self.path('map', 'user-id', user)
+        response = yield from self.req_handler(method, path)
         return ok(response)
