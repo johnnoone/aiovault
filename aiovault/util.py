@@ -1,11 +1,12 @@
 import asyncio
 import inspect
 import os.path
+import re
 from base64 import b64decode, b64encode
 from datetime import timedelta
 from functools import partial, wraps
 
-__all__ = ['format_duration', 'format_policies', 'task']
+__all__ = ['convert_duration', 'format_duration', 'format_policies', 'task']
 
 
 def base64_decode(data):
@@ -29,6 +30,24 @@ def format_duration(obj):
     if isinstance(obj, timedelta):
         return '%ss' % int(obj.total_seconds())
     raise ValueError('wrong type %r' % obj)
+
+
+def convert_duration(obj):
+    """Parse an api duration to timedelta"""
+    if isinstance(obj, str):
+        matches = re.match('''
+            ((?P<hours>\d+)h)?
+            ((?P<minutes>\d+)m)?
+            ((?P<seconds>\d+)s)?
+        ''', obj, re.X)
+        if matches:
+            h = int(matches.group('hours') or 0)
+            m = int(matches.group('minutes') or 0)
+            s = int(matches.group('seconds') or 0)
+            return timedelta(hours=h, minutes=m, seconds=s)
+    if isinstance(obj, int):
+        return timedelta(seconds=obj)
+    return obj
 
 
 def format_policies(obj):

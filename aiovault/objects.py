@@ -1,4 +1,5 @@
 from collections.abc import MutableMapping
+from aiovault.util import convert_duration
 
 
 class Status:
@@ -83,6 +84,9 @@ class Value(MutableMapping):
         if 'policies' in data:
             value = data['policies']
             self.data['policies'] = set(value.split(',') if value else [])
+        if 'lease' in data:
+            value = data['lease']
+            self.data['lease'] = convert_duration(value)
 
     def __eq__(self, other):
         if isinstance(other, Value):

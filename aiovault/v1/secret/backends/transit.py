@@ -45,7 +45,6 @@ class TransitBackend(SecretBackend):
         try:
             response = yield from self.req_handler(method, path)
             result = yield from response.json()
-            print(result)
             return Value(**result)
         except InvalidPath:
             raise KeyError('%r does not exists' % name)

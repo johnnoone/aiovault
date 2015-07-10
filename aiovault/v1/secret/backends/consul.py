@@ -1,7 +1,7 @@
 from .bases import SecretBackend
 from aiovault.exceptions import InvalidPath, InvalidRequest
 from aiovault.objects import Value
-from aiovault.util import base64_encode, ok, task
+from aiovault.util import base64_encode, ok, task, format_duration
 
 
 class ConsulBackend(SecretBackend):
@@ -54,7 +54,7 @@ class ConsulBackend(SecretBackend):
             raise KeyError('%r does not exists' % name)
 
     @task
-    def write_role(self, name, *, policy):
+    def write_role(self, name, *, policy, lease=None):
         """Creates or updates the Consul role definition.
 
         Parameters:
@@ -65,7 +65,8 @@ class ConsulBackend(SecretBackend):
         """
         method = 'POST'
         path = self.path('roles', name)
-        data = {'policy': base64_encode(policy)}
+        data = {'policy': base64_encode(policy),
+                'lease': format_duration(lease)}
 
         response = yield from self.req_handler(method, path, json=data)
         return ok(response)
